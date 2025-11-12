@@ -6,6 +6,6 @@ class DefaultLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: child);
+    return Scaffold(body: child, backgroundColor: Colors.white);
   }
 }
