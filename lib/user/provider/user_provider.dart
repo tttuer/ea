@@ -28,17 +28,22 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
     return LoginResponse.fromJson(response.response.data.toJson());
   }
 
-  // Future<LoginResponse> login(UserRequest userRequest) async {
-  //   state = const AsyncValue.loading();
+  Future<LoginResponse> login(UserRequest userRequest) async {
+    state = const AsyncValue.loading();
 
-  //   state = await AsyncValue.guard(() async {
-  //     final response = await _userRepository.login(userRequest: userRequest);
+    state = await AsyncValue.guard(() async {
+      final response = await _userRepository.login(userRequest: userRequest);
 
-  //     final refreshToken = response.response.headers.value(REFRESH_TOKEN);
+      _token.saveAccessToken(response.data.accessToken);
+      _token.saveRefreshToken(response.response.headers.value(REFRESH_TOKEN)!);
 
-  //     return response.data;
-  //   });
-  // }
+      return response.data;
+    });
+
+    state = AsyncValue.error(Exception('Login failed'), StackTrace.current);
+
+    return LoginResponse(accessToken: '', tokenType: '');
+  }
 
   Future<LoginResponse> refresh({String? refreshToken}) async {
     state = const AsyncValue.loading();

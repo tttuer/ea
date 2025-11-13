@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
 import 'package:electronic_approval/common/view/custom_input_text.dart';
 import 'package:electronic_approval/common/view/custom_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:electronic_approval/user/provider/user_provider.dart';
+import 'package:electronic_approval/user/model/user_request.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -89,6 +92,8 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
+
+    ref.read(userNotifierProvider.notifier).login(UserRequest(username: id, password: password));
   }
 }
 
