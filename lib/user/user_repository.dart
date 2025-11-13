@@ -30,5 +30,6 @@ abstract class UserRepository {
   });
 
   @GET('/me')
+  @Headers({'access_token': true})
   Future<HttpResponse<UserResponse>> me();
 }
