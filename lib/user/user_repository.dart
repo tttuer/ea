@@ -12,7 +12,7 @@ const String REFRESH_TOKEN = 'refresh_token';
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   final dio = ref.watch(dioProvider);
-  return UserRepository(dio, baseUrl: 'http://localhost:8080/api/users');
+  return UserRepository(dio, baseUrl: '${dio.options.baseUrl}/users');
 });
 
 @RestApi()
@@ -20,8 +20,10 @@ abstract class UserRepository {
   factory UserRepository(Dio dio, {required String baseUrl}) = _UserRepository;
 
   @POST('/login')
+  @FormUrlEncoded()
   Future<HttpResponse<LoginResponse>> login({
-    @Body() required UserRequest userRequest,
+    @Field('username') required String username,
+    @Field('password') required String password,
   });
 
   @POST('/refresh')

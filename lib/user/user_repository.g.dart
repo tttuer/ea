@@ -21,15 +21,20 @@ class _UserRepository implements UserRepository {
 
   @override
   Future<HttpResponse<LoginResponse>> login({
-    required UserRequest userRequest,
+    required String username,
+    required String password,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(userRequest.toJson());
+    final _data = {'username': username, 'password': password};
     final _options = _setStreamType<HttpResponse<LoginResponse>>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'application/x-www-form-urlencoded',
+          )
           .compose(
             _dio.options,
             '/login',

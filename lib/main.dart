@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/router/router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:electronic_approval/common/logger/logger_observer.dart';
 
 void main() {
-  runApp(ProviderScope(child: _App()));
+  runApp(ProviderScope(observers: [LoggerObserver()], child: _App()));
 }
 
 class _App extends StatelessWidget {

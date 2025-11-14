@@ -32,7 +32,10 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
     state = const AsyncValue.loading();
 
     state = await AsyncValue.guard(() async {
-      final response = await _userRepository.login(userRequest: userRequest);
+      final response = await _userRepository.login(
+        username: userRequest.username,
+        password: userRequest.password,
+      );
 
       _token.saveAccessToken(response.data.accessToken);
       _token.saveRefreshToken(response.response.headers.value(REFRESH_TOKEN)!);

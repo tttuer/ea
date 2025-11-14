@@ -20,6 +20,16 @@ class CustomInterceptor extends Interceptor {
       options.headers.addAll({'authorization': 'Bearer $accessToken'});
     }
 
+    print('options: ${options.path}');
+    print('options: ${options.headers}');
+    print('options: ${options.data}');
+    print('options: ${options.method}');
+    print('options: ${options.baseUrl}');
+    print('options: ${options.queryParameters}');
+    print('options: ${options.responseType}');
+    print('options: ${options.followRedirects}');
+    print('options: ${options.maxRedirects}');
+
     handler.next(options);
   }
 
