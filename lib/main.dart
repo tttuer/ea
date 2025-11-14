@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/router/router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const _App());
+  runApp(ProviderScope(child: _App()));
 }
 
 class _App extends StatelessWidget {

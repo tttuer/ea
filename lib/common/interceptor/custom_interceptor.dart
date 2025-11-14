@@ -8,14 +8,19 @@ class CustomInterceptor extends Interceptor {
   CustomInterceptor(this._token, this._dio);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    final isAccessTokenExists = options.headers['access_token'];
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    final isAccessTokenExists = options.headers['access_token'] ?? false;
 
     if (isAccessTokenExists) {
       final accessToken = await _token.getAccessToken();
 
       options.headers.addAll({'authorization': 'Bearer $accessToken'});
     }
+
+    handler.next(options);
   }
 
   @override
@@ -23,7 +28,10 @@ class CustomInterceptor extends Interceptor {
     var is401Error = err.response?.statusCode == 401;
     var path = err.requestOptions.path;
 
-    if (is401Error && path == '/api/users/login') {
+    final isLoginPath = path == '/api/users/login';
+    final isRefreshPath = path == '/api/users/refresh';
+
+    if (is401Error && (isLoginPath || isRefreshPath)) {
       return handler.reject(err);
     }
 

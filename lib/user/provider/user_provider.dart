@@ -40,9 +40,7 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
       return response.data;
     });
 
-    state = AsyncValue.error(Exception('Login failed'), StackTrace.current);
-
-    return LoginResponse(accessToken: '', tokenType: '');
+    return state.value ?? LoginResponse(accessToken: '', tokenType: '');
   }
 
   Future<LoginResponse> refresh({String? refreshToken}) async {

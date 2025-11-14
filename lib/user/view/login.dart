@@ -19,6 +19,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(userNotifierProvider);
+
+    ref.listen(userNotifierProvider, (previous, next) {
+      next.whenOrNull(
+        error: (error, stackTrace) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        },
+      );
+    });
+
     return DefaultLayout(
       child: Padding(
         padding: EdgeInsets.all(16),
@@ -38,38 +53,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 bottom: true,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _Title(),
-                      SizedBox(height: 16),
-                      CustomInputText(
-                        labelText: '아이디',
-                        prefixIcon: Icons.person,
-                        controller: _idController,
-                        obscureText: false,
-                      ),
-                      SizedBox(height: 16),
-                      CustomInputText(
-                        labelText: '비밀번호',
-                        prefixIcon: Icons.lock,
-                        controller: _passwordController,
-                        obscureText: true,
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomButton(onPressed: _login, text: '로그인'),
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: CustomButton(onPressed: () {}, text: '회원가입'),
-                          ),
-                        ],
-                      ),
-                    ],
+                  child: userState.when(
+                    data: (_) => _buildForm(isLoading: false),
+                    error: (error, stackTrace) => _buildForm(isLoading: false),
+                    loading: () => _buildForm(isLoading: true),
                   ),
                 ),
               ),
@@ -77,6 +64,43 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildForm({required bool isLoading}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _Title(),
+        SizedBox(height: 16),
+        CustomInputText(
+          labelText: '아이디',
+          prefixIcon: Icons.person,
+          controller: _idController,
+          obscureText: false,
+        ),
+        SizedBox(height: 16),
+        CustomInputText(
+          labelText: '비밀번호',
+          prefixIcon: Icons.lock,
+          controller: _passwordController,
+          obscureText: true,
+        ),
+        SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: CustomButton(
+                onPressed: isLoading ? null : _login,
+                child: isLoading ? CircularProgressIndicator() : Text('로그인'),
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(child: CustomButton(child: Text('회원가입'))),
+          ],
+        ),
+      ],
     );
   }
 
@@ -93,7 +117,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
 
-    ref.read(userNotifierProvider.notifier).login(UserRequest(username: id, password: password));
+    ref
+        .read(userNotifierProvider.notifier)
+        .login(UserRequest(username: id, password: password));
   }
 }
 
