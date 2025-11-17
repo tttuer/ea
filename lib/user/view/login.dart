@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/user/provider/user_provider.dart';
 import 'package:electronic_approval/user/model/user_request.dart';
 import 'dart:math' as math;
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -28,7 +29,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.listen(userNotifierProvider, (previous, next) {
       next.whenOrNull(
         error: (error, stackTrace) {
-          print('error: $error');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.'),
@@ -119,6 +119,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref
         .read(userNotifierProvider.notifier)
         .login(UserRequest(username: id, password: password));
+    
+    
+    context.push('/drafts');
   }
 }
 

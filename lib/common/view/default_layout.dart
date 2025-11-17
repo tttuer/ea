@@ -2,10 +2,22 @@ import 'package:flutter/material.dart';
 
 class DefaultLayout extends StatelessWidget {
   final Widget child;
-  const DefaultLayout({super.key, required this.child});
+  final PreferredSizeWidget? appBar;
+  final Widget? drawer;
+  const DefaultLayout({
+    super.key,
+    required this.child,
+    this.appBar,
+    this.drawer,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: child, backgroundColor: Colors.white);
+    return Scaffold(
+      body: child,
+      backgroundColor: Colors.white,
+      appBar: appBar,
+      drawer: drawer,
+    );
   }
 }
