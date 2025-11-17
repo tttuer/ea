@@ -20,7 +20,7 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
     final accessToken = await _token.getAccessToken();
 
     if (accessToken == null) {
-      return LoginResponse(accessToken: '', tokenType: '');
+      return LoginResponse(accessToken: '', tokenType: '', refreshToken: '');
     }
 
     final response = await _userRepository.me();
@@ -38,12 +38,13 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
       );
 
       _token.saveAccessToken(response.data.accessToken);
-      _token.saveRefreshToken(response.response.headers.value(REFRESH_TOKEN)!);
+      _token.saveRefreshToken(response.data.refreshToken);
 
       return response.data;
     });
 
-    return state.value ?? LoginResponse(accessToken: '', tokenType: '');
+    return state.value ??
+        LoginResponse(accessToken: '', refreshToken: '', tokenType: '');
   }
 
   Future<LoginResponse> refresh({String? refreshToken}) async {
@@ -59,6 +60,7 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
       return LoginResponse.fromJson(data);
     });
 
-    return state.value ?? LoginResponse(accessToken: '', tokenType: '');
+    return state.value ??
+        LoginResponse(accessToken: '', tokenType: '', refreshToken: '');
   }
 }

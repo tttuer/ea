@@ -5,6 +5,7 @@ import 'package:electronic_approval/common/view/custom_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/user/provider/user_provider.dart';
 import 'package:electronic_approval/user/model/user_request.dart';
+import 'dart:math' as math;
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -21,9 +22,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final userState = ref.watch(userNotifierProvider);
 
+    final height = MediaQuery.of(context).size.height;
+    final used = MediaQuery.of(context).padding.top + kToolbarHeight + 16 * 2;
+
     ref.listen(userNotifierProvider, (previous, next) {
       next.whenOrNull(
         error: (error, stackTrace) {
+          print('error: $error');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.'),
@@ -40,13 +45,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight:
-                  MediaQuery.of(context).size.height -
-                  (MediaQuery.of(context).padding.top +
-                      kToolbarHeight +
-                      16 * 2),
-            ),
+            constraints: BoxConstraints(minHeight: math.max(0, height - used)),
             child: Center(
               child: SafeArea(
                 top: true,
