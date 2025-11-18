@@ -1,0 +1,29 @@
+import 'package:dio/dio.dart' hide Headers;
+import 'package:retrofit/retrofit.dart';
+import 'package:electronic_approval/drafts/model/drafts.dart';
+import 'package:electronic_approval/common/pagination/pagination.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:electronic_approval/common/dio/dio.dart';
+
+part 'drafts_repository.g.dart';
+
+final draftsRepositoryProvider = Provider<DraftsRepository>((ref) {
+  final dio = ref.watch(dioProvider);
+  return DraftsRepository(dio, baseUrl: '${dio.options.baseUrl}/approvals');
+});
+
+@RestApi()
+abstract class DraftsRepository {
+  factory DraftsRepository(Dio dio, {required String baseUrl}) = _DraftsRepository;
+
+  @GET('/')
+  @Headers({'access_token': true})
+  Future<Pagination<Drafts>> getDrafts({
+    @Query('page') int page = 1,
+    @Query('page_size') int pageSize = 20,
+    @Query('sort') String? sort,
+    @Query('status') DocumentStatus? status,
+    @Query('start_date') String? startDate,
+    @Query('end_date') String? endDate,
+  });
+}

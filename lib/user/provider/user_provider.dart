@@ -14,6 +14,7 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
 
   @override
   Future<LoginResponse> build() async {
+    state = const AsyncValue.loading();
     _userRepository = ref.watch(userRepositoryProvider);
     _token = ref.watch(tokenProvider);
 
