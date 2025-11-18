@@ -17,11 +17,12 @@ final router = GoRouter(
           appBar: AppBar(
             title: Text(titles[routeName] ?? '전자결재'),
             backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
             bottom: PreferredSize(
               preferredSize: Size.fromHeight(1),
               child: Container(color: Colors.grey.shade300, height: 1),
             ),
-            actions: [IconButton(onPressed: () {}, icon: Icon(Icons.logout))],
+            actions: [IconButton(onPressed: () {}, icon: Icon(Icons.account_circle_outlined), iconSize: 30,)],
           ),
           drawer: const _Drawer(),
           child: child,
