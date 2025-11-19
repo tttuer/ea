@@ -100,9 +100,9 @@ enum DocumentStatus {
   @JsonValue('SUBMITTED')
   submitted('결재대기', Colors.yellow),
   @JsonValue('IN_PROGRESS')
-  inProgress('결재중', Colors.blue),
+  inProgress('결재중', Color.fromARGB(255, 109, 216, 245)),
   @JsonValue('APPROVED')
-  approved('결재완료', Color.fromARGB(255, 193, 248, 194)),
+  approved('결재완료', Color.fromARGB(255, 213, 213, 213)),
   @JsonValue('REJECTED')
   rejected('반려', Colors.red),
   @JsonValue('CANCELLED')

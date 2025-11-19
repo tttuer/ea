@@ -14,9 +14,22 @@ class DraftsScreen extends ConsumerStatefulWidget {
 }
 
 class _DraftsScreenState extends ConsumerState<DraftsScreen> {
+  final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        ref.read(draftsListNotifierProvider.notifier).fetchMore();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -24,22 +37,11 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
     final draftsState = ref.watch(draftsListNotifierProvider);
     return draftsState.when(
       loading: () => DefaultLayout(
-        child: Skeletonizer(
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return _DraftsItem(
-                icon: Icons.description_outlined,
-                title: 'title',
-                content: 'content',
-                status: DocumentStatus.draft,
-              );
-            },
-            itemCount: 10,
-          ),
-        ),
+        child: CustomScrollView(slivers: [_SkeletonLoader(itemCount: 10)]),
       ),
       data: (Pagination<Drafts> data) => DefaultLayout(
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverList.builder(
               itemBuilder: (context, index) {
@@ -52,6 +54,7 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
               },
               itemCount: data.items.length,
             ),
+            if (data.isLoadingMore) _SkeletonLoader(itemCount: 2),
           ],
         ),
       ),
@@ -143,6 +146,28 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(label, style: TextStyle(fontSize: 13)),
+    );
+  }
+}
+
+class _SkeletonLoader extends StatelessWidget {
+  final int itemCount;
+  const _SkeletonLoader({required this.itemCount});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverList.builder(
+      itemBuilder: (context, index) {
+        return Skeletonizer(
+          child: _DraftsItem(
+            icon: Icons.description_outlined,
+            title: 'title',
+            content: 'content',
+            status: DocumentStatus.draft,
+          ),
+        );
+      },
+      itemCount: itemCount,
     );
   }
 }

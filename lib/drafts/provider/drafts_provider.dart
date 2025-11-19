@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/drafts/repository/drafts_repository.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
@@ -23,14 +25,19 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
     });
 
     return state.value ??
-        Pagination(total: 0, page: 0, pageSize: 0, totalPages: 0, items: []);
+        Pagination(
+          isLoadingMore: false,
+          total: 0,
+          page: 0,
+          pageSize: 0,
+          totalPages: 0,
+          items: [],
+        );
   }
 
   Future<void> getDrafts() async {
-    print('getDrafts');
     state = await AsyncValue.guard(() async {
       final response = await _draftsRepository.getDrafts();
-      print('response: ${response.items}');
       return response;
     });
   }
@@ -46,12 +53,16 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
       return;
     }
 
+    _isLoading = true;
+    state = AsyncValue.data(currentData.copyWith(isLoadingMore: true));
+
     try {
       final response = await _draftsRepository.getDrafts(
         page: currentData.page + 1,
       );
       final newItems = [...currentData.items, ...response.items];
       final newPagination = currentData.copyWith(
+        isLoadingMore: false,
         total: response.total,
         page: response.page,
         pageSize: response.pageSize,

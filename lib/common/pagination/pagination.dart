@@ -4,6 +4,7 @@ part 'pagination.g.dart';
 
 @JsonSerializable(genericArgumentFactories: true)
 class Pagination<T> {
+  final bool isLoadingMore;
   final int total;
   final int page;
   @JsonKey(name: 'page_size')
@@ -13,6 +14,7 @@ class Pagination<T> {
   final List<T> items;
 
   Pagination({
+    this.isLoadingMore = false,
     required this.total,
     required this.page,
     required this.pageSize,
@@ -21,12 +23,14 @@ class Pagination<T> {
   });
 
   Pagination<T> copyWith({
+    bool? isLoadingMore,
     int? total,
     int? page,
     int? pageSize,
     int? totalPages,
     List<T>? items,
   }) => Pagination<T>(
+    isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     total: total ?? this.total,
     page: page ?? this.page,
     pageSize: pageSize ?? this.pageSize,
