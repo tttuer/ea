@@ -45,7 +45,7 @@ class _DraftsRepository implements DraftsRepository {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/',
+            '',
             queryParameters: queryParameters,
             data: _data,
           )

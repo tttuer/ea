@@ -16,7 +16,7 @@ final draftsRepositoryProvider = Provider<DraftsRepository>((ref) {
 abstract class DraftsRepository {
   factory DraftsRepository(Dio dio, {required String baseUrl}) = _DraftsRepository;
 
-  @GET('/')
+  @GET('')
   @Headers({'access_token': true})
   Future<Pagination<Drafts>> getDrafts({
     @Query('page') int page = 1,

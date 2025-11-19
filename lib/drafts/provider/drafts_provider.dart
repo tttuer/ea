@@ -27,8 +27,10 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
   }
 
   Future<void> getDrafts() async {
+    print('getDrafts');
     state = await AsyncValue.guard(() async {
       final response = await _draftsRepository.getDrafts();
+      print('response: ${response.items}');
       return response;
     });
   }

@@ -28,7 +28,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     ref.listen(userNotifierProvider, (previous, next) {
       next.whenOrNull(
+        data: (data) {
+          if (data.accessToken.isNotEmpty) {
+            context.push('/drafts');
+          }
+        },
         error: (error, stackTrace) {
+          print(error);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.'),
@@ -103,7 +109,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  void _login() {
+  void _login() async {
     final id = _idController.text;
     final password = _passwordController.text;
     if (id == '' || password == '') {
@@ -119,9 +125,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref
         .read(userNotifierProvider.notifier)
         .login(UserRequest(username: id, password: password));
-    
-    
-    context.push('/drafts');
   }
 }
 

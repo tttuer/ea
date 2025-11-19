@@ -15,15 +15,15 @@ Drafts _$DraftsFromJson(Map<String, dynamic> json) => Drafts(
   formData: json['form_data'] as Map<String, dynamic>,
   requesterId: json['requester_id'] as String,
   requesterName: json['requester_name'] as String,
-  departmentId: json['department_id'] as String,
+  departmentId: json['department_id'] as String?,
   status: $enumDecode(_$DocumentStatusEnumMap, json['status']),
   currentStep: (json['current_step'] as num).toInt(),
   createdAt: json['created_at'] as String,
   updatedAt: json['updated_at'] as String,
-  submittedAt: json['submitted_at'] as String,
-  completedAt: json['completed_at'] as String,
-  histories: (json['histories'] as List<dynamic>)
-      .map((e) => ApprovalHistory.fromJson(e as Map<String, dynamic>))
+  submittedAt: json['submitted_at'] as String?,
+  completedAt: json['completed_at'] as String?,
+  histories: (json['histories'] as List<dynamic>?)
+      ?.map((e) => ApprovalHistory.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 

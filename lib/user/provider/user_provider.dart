@@ -17,16 +17,7 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
     state = const AsyncValue.loading();
     _userRepository = ref.watch(userRepositoryProvider);
     _token = ref.watch(tokenProvider);
-
-    final accessToken = await _token.getAccessToken();
-
-    if (accessToken == null) {
-      return LoginResponse(accessToken: '', tokenType: '', refreshToken: '');
-    }
-
-    final response = await _userRepository.me();
-
-    return LoginResponse.fromJson(response.response.data.toJson());
+    return LoginResponse(accessToken: '', refreshToken: '', tokenType: '');
   }
 
   Future<LoginResponse> login(UserRequest userRequest) async {
@@ -37,7 +28,6 @@ class UserNotifier extends AsyncNotifier<LoginResponse> {
         username: userRequest.username,
         password: userRequest.password,
       );
-
       _token.saveAccessToken(response.data.accessToken);
       _token.saveRefreshToken(response.data.refreshToken);
 

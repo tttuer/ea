@@ -41,6 +41,9 @@ class CustomInterceptor extends Interceptor {
         return handler.reject(err);
       }
       var options = err.requestOptions;
+      if (options.extra['retried'] == true) {
+        return handler.reject(err);
+      }
 
       final resp = await _dio.post(
         '/users/refresh',
@@ -53,6 +56,7 @@ class CustomInterceptor extends Interceptor {
 
       options.headers.addAll({'authorization': 'Bearer $accessToken'});
 
+      options.extra['retried'] = true;
       var response = await _dio.fetch(options);
 
       return handler.resolve(response);

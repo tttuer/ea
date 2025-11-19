@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'drafts.g.dart';
@@ -20,7 +21,7 @@ class Drafts {
   @JsonKey(name: 'requester_name')
   final String requesterName;
   @JsonKey(name: 'department_id')
-  final String departmentId;
+  final String? departmentId;
   final DocumentStatus status;
   @JsonKey(name: 'current_step')
   final int currentStep;
@@ -29,11 +30,11 @@ class Drafts {
   @JsonKey(name: 'updated_at')
   final String updatedAt;
   @JsonKey(name: 'submitted_at')
-  final String submittedAt;
+  final String? submittedAt;
   @JsonKey(name: 'completed_at')
-  final String completedAt;
+  final String? completedAt;
   @JsonKey(name: 'histories')
-  final List<ApprovalHistory> histories;
+  final List<ApprovalHistory>? histories;
 
   Drafts({
     required this.id,
@@ -44,21 +45,19 @@ class Drafts {
     required this.formData,
     required this.requesterId,
     required this.requesterName,
-    required this.departmentId,
+    this.departmentId,
     required this.status,
     required this.currentStep,
     required this.createdAt,
     required this.updatedAt,
-    required this.submittedAt,
-    required this.completedAt,
-    required this.histories,
+    this.submittedAt,
+    this.completedAt,
+    this.histories,
   });
 
   factory Drafts.fromJson(Map<String, dynamic> json) => _$DraftsFromJson(json);
   Map<String, dynamic> toJson() => _$DraftsToJson(this);
-
 }
-
 
 @JsonSerializable()
 class ApprovalHistory {
@@ -90,23 +89,29 @@ class ApprovalHistory {
     required this.ipAddress,
   });
 
-  factory ApprovalHistory.fromJson(Map<String, dynamic> json) => _$ApprovalHistoryFromJson(json);
+  factory ApprovalHistory.fromJson(Map<String, dynamic> json) =>
+      _$ApprovalHistoryFromJson(json);
   Map<String, dynamic> toJson() => _$ApprovalHistoryToJson(this);
 }
 
 enum DocumentStatus {
   @JsonValue('DRAFT')
-  draft,
+  draft('기안', Colors.grey),
   @JsonValue('SUBMITTED')
-  submitted,
+  submitted('결재대기', Colors.yellow),
   @JsonValue('IN_PROGRESS')
-  inProgress,
+  inProgress('결재중', Colors.blue),
   @JsonValue('APPROVED')
-  approved,
+  approved('결재완료', Color.fromARGB(255, 193, 248, 194)),
   @JsonValue('REJECTED')
-  rejected,
+  rejected('반려', Colors.red),
   @JsonValue('CANCELLED')
-  cancelled,
+  cancelled('취소', Colors.grey);
+
+  final String statusText;
+  final Color color;
+
+  const DocumentStatus(this.statusText, this.color);
 }
 
 enum ApprovalAction {

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
 import 'package:electronic_approval/common/pagination/pagination.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class DraftsScreen extends ConsumerStatefulWidget {
   const DraftsScreen({super.key});
@@ -16,23 +17,37 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(draftsListNotifierProvider.notifier).getDrafts();
   }
 
   @override
   Widget build(BuildContext context) {
     final draftsState = ref.watch(draftsListNotifierProvider);
     return draftsState.when(
-      loading: () => DefaultLayout(child: CircularProgressIndicator()),
+      loading: () => DefaultLayout(
+        child: Skeletonizer(
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              return _DraftsItem(
+                icon: Icons.description_outlined,
+                title: 'title',
+                content: 'content',
+                status: DocumentStatus.draft,
+              );
+            },
+            itemCount: 10,
+          ),
+        ),
+      ),
       data: (Pagination<Drafts> data) => DefaultLayout(
         child: CustomScrollView(
           slivers: [
             SliverList.builder(
               itemBuilder: (context, index) {
                 return _DraftsItem(
-                  title: 'Drafts',
-                  content: 'Drafts',
+                  title: data.items[index].title,
+                  content: data.items[index].content,
                   icon: Icons.description_outlined,
+                  status: data.items[index].status,
                 );
               },
               itemCount: data.items.length,
@@ -50,11 +65,13 @@ class _DraftsItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String content;
+  final DocumentStatus status;
 
   const _DraftsItem({
     required this.icon,
     required this.title,
     required this.content,
+    required this.status,
   });
 
   @override
@@ -101,7 +118,7 @@ class _DraftsItem extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 16),
-              _StatusBadge(label: '결재대기', color: Colors.yellow),
+              _StatusBadge(label: status.statusText, color: status.color),
             ],
           ),
         ),
