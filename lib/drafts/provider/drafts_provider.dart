@@ -36,6 +36,7 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
   }
 
   Future<void> getDrafts() async {
+    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final response = await _draftsRepository.getDrafts();
       return response;
@@ -71,7 +72,7 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
       );
       state = AsyncValue.data(newPagination);
     } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
+      state = AsyncValue.data(currentData.copyWith(isLoadingMore: false));
     } finally {
       _isLoading = false;
     }

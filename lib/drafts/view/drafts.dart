@@ -40,22 +40,29 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
         child: CustomScrollView(slivers: [_SkeletonLoader(itemCount: 10)]),
       ),
       data: (Pagination<Drafts> data) => DefaultLayout(
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverList.builder(
-              itemBuilder: (context, index) {
-                return _DraftsItem(
-                  title: data.items[index].title,
-                  content: data.items[index].content,
-                  icon: Icons.description_outlined,
-                  status: data.items[index].status,
-                );
-              },
-              itemCount: data.items.length,
-            ),
-            if (data.isLoadingMore) _SkeletonLoader(itemCount: 2),
-          ],
+        child: RefreshIndicator(
+          backgroundColor: Colors.white,
+          color: Colors.blue,
+          onRefresh: () async {
+            ref.read(draftsListNotifierProvider.notifier).getDrafts();
+          },
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverList.builder(
+                itemBuilder: (context, index) {
+                  return _DraftsItem(
+                    title: data.items[index].title,
+                    content: data.items[index].content,
+                    icon: Icons.description_outlined,
+                    status: data.items[index].status,
+                  );
+                },
+                itemCount: data.items.length,
+              ),
+              if (data.isLoadingMore) _SkeletonLoader(itemCount: 2),
+            ],
+          ),
         ),
       ),
       error: (error, stackTrace) =>
