@@ -1,40 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
+import 'package:electronic_approval/drafts/model/drafts.dart';
+import 'package:electronic_approval/common/pagination/pagination.dart';
 
-class DraftsScreen extends StatelessWidget {
+class DraftsScreen extends ConsumerStatefulWidget {
   const DraftsScreen({super.key});
 
   @override
+  ConsumerState<DraftsScreen> createState() => _DraftsScreenState();
+}
+
+class _DraftsScreenState extends ConsumerState<DraftsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(draftsListNotifierProvider.notifier).getDrafts();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultLayout(
-      child: CustomScrollView(
-        slivers: [
-          SliverList.builder(
-            itemBuilder: (context, index) {
-              return _DraftsItem(
-                title: 'Drafts',
-                content: 'Drafts',
-                icon: Icons.description_outlined,
-              );
-            },
-            itemCount: 15,
-          ),
-        ],
+    final draftsState = ref.watch(draftsListNotifierProvider);
+    return draftsState.when(
+      loading: () => DefaultLayout(child: CircularProgressIndicator()),
+      data: (Pagination<Drafts> data) => DefaultLayout(
+        child: CustomScrollView(
+          slivers: [
+            SliverList.builder(
+              itemBuilder: (context, index) {
+                return _DraftsItem(
+                  title: 'Drafts',
+                  content: 'Drafts',
+                  icon: Icons.description_outlined,
+                );
+              },
+              itemCount: data.items.length,
+            ),
+          ],
+        ),
       ),
+      error: (error, stackTrace) =>
+          DefaultLayout(child: Text(error.toString())),
     );
   }
 }
 
 class _DraftsItem extends StatelessWidget {
+  final IconData icon;
   final String title;
   final String content;
-  final IconData icon;
 
   const _DraftsItem({
-    super.key,
+    required this.icon,
     required this.title,
     required this.content,
-    required this.icon,
   });
 
   @override

@@ -2,9 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'pagination.g.dart';
 
-@JsonSerializable(
-  genericArgumentFactories: true,
-)
+@JsonSerializable(genericArgumentFactories: true)
 class Pagination<T> {
   final int total;
   final int page;
@@ -14,7 +12,6 @@ class Pagination<T> {
   final int totalPages;
   final List<T> items;
 
-
   Pagination({
     required this.total,
     required this.page,
@@ -22,6 +19,20 @@ class Pagination<T> {
     required this.totalPages,
     required this.items,
   });
+
+  Pagination<T> copyWith({
+    int? total,
+    int? page,
+    int? pageSize,
+    int? totalPages,
+    List<T>? items,
+  }) => Pagination<T>(
+    total: total ?? this.total,
+    page: page ?? this.page,
+    pageSize: pageSize ?? this.pageSize,
+    totalPages: totalPages ?? this.totalPages,
+    items: items ?? this.items,
+  );
 
   factory Pagination.fromJson(
     Map<String, dynamic> json,
