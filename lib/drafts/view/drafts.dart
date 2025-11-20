@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
+import 'package:electronic_approval/common/view/custom_filter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
@@ -49,6 +50,7 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
+              SliverToBoxAdapter(child: CustomFilter()),
               SliverList.builder(
                 itemBuilder: (context, index) {
                   return _DraftsItem(
@@ -106,23 +108,28 @@ class _DraftsItem extends StatelessWidget {
                       child: Icon(icon),
                     ),
                     SizedBox(width: 16),
-                    Column(
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                        Text(
-                          content,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                          Text(
+                            content,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

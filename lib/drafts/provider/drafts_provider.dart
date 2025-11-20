@@ -18,7 +18,6 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
 
   @override
   Future<Pagination<Drafts>> build() async {
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final response = await _draftsRepository.getDrafts();
       return response;
@@ -36,7 +35,6 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
   }
 
   Future<void> getDrafts() async {
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final response = await _draftsRepository.getDrafts();
       return response;

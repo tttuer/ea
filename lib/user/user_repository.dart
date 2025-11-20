@@ -3,7 +3,6 @@ import 'package:retrofit/retrofit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/common/dio/dio.dart';
 import 'package:electronic_approval/user/model/login_response.dart';
-import 'package:electronic_approval/user/model/user_request.dart';
 import 'package:electronic_approval/user/model/user_response.dart';
 
 part 'user_repository.g.dart';
