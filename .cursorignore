@@ -1,0 +1,55 @@
+# --- Python 관련 ---
+# 가상환경 폴더 (이게 제일 중요합니다. 수만 개의 파일을 무시합니다)
+.venv/
+venv/
+env/
+anaconda3/
+
+# 캐시 및 컴파일 파일
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# 데이터 파일 (AI가 읽다가 멈출 수 있음)
+*.csv
+*.json
+*.pkl
+*.h5
+*.pt
+
+# --- Flutter/Dart 관련 ---
+# 빌드 아티팩트 (용량이 매우 큼)
+build/
+.dart_tool/
+
+# 패키지 관련
+pubspec.lock
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# --- 플랫폼별 자동 생성/라이브러리 파일 ---
+# iOS: Pods 폴더가 수천 개의 파일을 포함하므로 반드시 무시
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework/
+ios/Flutter/App.framework/
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# macOS, Linux, Windows (필요 시 주석 해제)
+# macos/Flutter/ephemeral/
+# linux/flutter/ephemeral/
+# windows/flutter/ephemeral/
+
+# --- 기타 ---
+.git/
+.idea/
+.vscode/
+*.log
+*.svg
+*.png
+*.jpg
