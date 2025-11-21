@@ -3,6 +3,7 @@ import 'package:electronic_approval/common/view/filter_components.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
+import 'package:electronic_approval/drafts/provider/drafts_filter_provider.dart';
 
 class DraftsFilterScreen extends ConsumerStatefulWidget {
   const DraftsFilterScreen({super.key});
@@ -12,27 +13,10 @@ class DraftsFilterScreen extends ConsumerStatefulWidget {
 }
 
 class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
-  DocumentStatus? selectedStatus;
-  DateTime? selectedStartDate;
-  DateTime? selectedEndDate;
-
-  @override
-  void initState() {
-    super.initState();
-    final draftsListNotifier = ref.read(draftsListNotifierProvider.notifier);
-    selectedStatus = ref
-        .read(draftsListNotifierProvider.notifier)
-        .selectedStatus;
-    selectedStartDate = ref
-        .read(draftsListNotifierProvider.notifier)
-        .selectedStartDate;
-    selectedEndDate = ref
-        .read(draftsListNotifierProvider.notifier)
-        .selectedEndDate;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final filterState = ref.watch(draftsFilterNotifierProvider);
+    final filterNotifier = ref.read(draftsFilterNotifierProvider.notifier);
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
@@ -47,11 +31,8 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  '필터',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -77,7 +58,7 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                         ...DocumentStatus.values.map(
                           (status) => ChoiceChip(
                             label: Text(status.statusText),
-                            selected: selectedStatus == status,
+                            selected: filterState.selectedStatus == status,
                             backgroundColor: Colors.white,
                             selectedColor: Colors.blue,
                             labelStyle: TextStyle(color: Colors.black),
@@ -86,13 +67,7 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             onSelected: (selected) {
-                              ref
-                                  .read(draftsListNotifierProvider.notifier)
-                                  .setFilter(
-                                    selectedStatus,
-                                    selectedStartDate,
-                                    selectedEndDate,
-                                  );
+                              filterNotifier.setStatus(selected ? status : null);
                             },
                           ),
                         ),
@@ -114,25 +89,18 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                               final date = await showDatePicker(
                                 context: context,
                                 initialDate:
-                                    selectedStartDate ?? DateTime.now(),
+                                    filterState.selectedStartDate ?? DateTime.now(),
                                 firstDate: DateTime(2001),
                                 lastDate: DateTime.now(),
                               );
                               if (date != null) {
-                                selectedStartDate = date;
-                                ref
-                                    .read(draftsListNotifierProvider.notifier)
-                                    .setFilter(
-                                      selectedStatus,
-                                      selectedStartDate,
-                                      selectedEndDate,
-                                    );
+                                filterNotifier.setStartDate(date);
                               }
                             },
                             child: Text(
-                              selectedStartDate == null
+                              filterState.selectedStartDate == null
                                   ? '시작일'
-                                  : '${selectedStartDate!.year}-${selectedStartDate!.month}-${selectedStartDate!.day}',
+                                  : '${filterState.selectedStartDate!.year}-${filterState.selectedStartDate!.month}-${filterState.selectedStartDate!.day}',
                             ),
                           ),
                         ),
@@ -152,25 +120,18 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                             onPressed: () async {
                               final date = await showDatePicker(
                                 context: context,
-                                initialDate: selectedEndDate ?? DateTime.now(),
+                                initialDate: filterState.selectedEndDate ?? DateTime.now(),
                                 firstDate: DateTime(2001),
                                 lastDate: DateTime.now(),
                               );
                               if (date != null) {
-                                selectedEndDate = date;
-                                ref
-                                    .read(draftsListNotifierProvider.notifier)
-                                    .setFilter(
-                                      selectedStatus,
-                                      selectedStartDate,
-                                      selectedEndDate,
-                                    );
+                                filterNotifier.setEndDate(date);
                               }
                             },
                             child: Text(
-                              selectedEndDate == null
+                              filterState.selectedEndDate == null
                                   ? '종료일'
-                                  : '${selectedEndDate!.year}-${selectedEndDate!.month}-${selectedEndDate!.day}',
+                                  : '${filterState.selectedEndDate!.year}-${filterState.selectedEndDate!.month}-${filterState.selectedEndDate!.day}',
                             ),
                           ),
                         ),
@@ -185,14 +146,12 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
             padding: const EdgeInsets.all(8.0),
             child: FilterBottomButtons(
               onReset: () {
-                ref
-                    .read(draftsListNotifierProvider.notifier)
-                    .setFilter(null, null, null);
+                filterNotifier.reset();
               },
               onApply: () {
-                if (selectedEndDate != null &&
-                    selectedStartDate != null &&
-                    selectedEndDate!.isBefore(selectedStartDate!)) {
+                if (filterState.selectedEndDate != null &&
+                    filterState.selectedStartDate != null &&
+                    filterState.selectedEndDate!.isBefore(filterState.selectedStartDate!)) {
                   SnackBar snackBar = SnackBar(
                     duration: Duration(seconds: 2),
                     content: Text('종료일이 시작일보다 이전일 수 없습니다.'),
@@ -202,13 +161,7 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                   return;
                 }
 
-                ref
-                    .read(draftsListNotifierProvider.notifier)
-                    .setFilter(
-                      selectedStatus,
-                      selectedStartDate,
-                      selectedEndDate,
-                    );
+                ref.read(draftsListNotifierProvider.notifier).getDrafts();
                 Navigator.pop(context);
               },
             ),

@@ -7,6 +7,7 @@ import 'package:electronic_approval/drafts/model/drafts.dart';
 import 'package:electronic_approval/common/pagination/pagination.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:electronic_approval/drafts/view/drafts_filter_screen.dart';
+import 'package:electronic_approval/drafts/provider/drafts_filter_provider.dart';
 
 class DraftsScreen extends ConsumerStatefulWidget {
   const DraftsScreen({super.key});
@@ -65,7 +66,7 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
                 child: CustomFilterButton(
                   onPressed: _showFilterScreen,
                   filterCount: ref
-                      .read(draftsListNotifierProvider.notifier)
+                      .read(draftsFilterNotifierProvider.notifier)
                       .filterCount,
                 ),
               ),
