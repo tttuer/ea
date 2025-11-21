@@ -1,18 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/view/filter_components.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
 
-class DraftsFilterScreen extends StatefulWidget {
+class DraftsFilterScreen extends ConsumerStatefulWidget {
   const DraftsFilterScreen({super.key});
 
   @override
-  State<DraftsFilterScreen> createState() => _DraftsFilterScreenState();
+  ConsumerState<DraftsFilterScreen> createState() => _DraftsFilterScreenState();
 }
 
-class _DraftsFilterScreenState extends State<DraftsFilterScreen> {
+class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
   DocumentStatus? selectedStatus;
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
+
+  @override
+  void initState() {
+    super.initState();
+    final draftsListNotifier = ref.read(draftsListNotifierProvider.notifier);
+    selectedStatus = ref
+        .read(draftsListNotifierProvider.notifier)
+        .selectedStatus;
+    selectedStartDate = ref
+        .read(draftsListNotifierProvider.notifier)
+        .selectedStartDate;
+    selectedEndDate = ref
+        .read(draftsListNotifierProvider.notifier)
+        .selectedEndDate;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +86,13 @@ class _DraftsFilterScreenState extends State<DraftsFilterScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             onSelected: (selected) {
-                              setState(() {
-                                selectedStatus = selected ? status : null;
-                              });
+                              ref
+                                  .read(draftsListNotifierProvider.notifier)
+                                  .setFilter(
+                                    selectedStatus,
+                                    selectedStartDate,
+                                    selectedEndDate,
+                                  );
                             },
                           ),
                         ),
@@ -98,9 +119,14 @@ class _DraftsFilterScreenState extends State<DraftsFilterScreen> {
                                 lastDate: DateTime.now(),
                               );
                               if (date != null) {
-                                setState(() {
-                                  selectedStartDate = date;
-                                });
+                                selectedStartDate = date;
+                                ref
+                                    .read(draftsListNotifierProvider.notifier)
+                                    .setFilter(
+                                      selectedStatus,
+                                      selectedStartDate,
+                                      selectedEndDate,
+                                    );
                               }
                             },
                             child: Text(
@@ -131,9 +157,14 @@ class _DraftsFilterScreenState extends State<DraftsFilterScreen> {
                                 lastDate: DateTime.now(),
                               );
                               if (date != null) {
-                                setState(() {
-                                  selectedEndDate = date;
-                                });
+                                selectedEndDate = date;
+                                ref
+                                    .read(draftsListNotifierProvider.notifier)
+                                    .setFilter(
+                                      selectedStatus,
+                                      selectedStartDate,
+                                      selectedEndDate,
+                                    );
                               }
                             },
                             child: Text(
@@ -154,11 +185,9 @@ class _DraftsFilterScreenState extends State<DraftsFilterScreen> {
             padding: const EdgeInsets.all(8.0),
             child: FilterBottomButtons(
               onReset: () {
-                setState(() {
-                  selectedStatus = null;
-                  selectedStartDate = null;
-                  selectedEndDate = null;
-                });
+                ref
+                    .read(draftsListNotifierProvider.notifier)
+                    .setFilter(null, null, null);
               },
               onApply: () {
                 if (selectedEndDate != null &&
@@ -172,11 +201,15 @@ class _DraftsFilterScreenState extends State<DraftsFilterScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   return;
                 }
-                Navigator.pop(context, {
-                  'status': selectedStatus,
-                  'startDate': selectedStartDate,
-                  'endDate': selectedEndDate,
-                });
+
+                ref
+                    .read(draftsListNotifierProvider.notifier)
+                    .setFilter(
+                      selectedStatus,
+                      selectedStartDate,
+                      selectedEndDate,
+                    );
+                Navigator.pop(context);
               },
             ),
           ),

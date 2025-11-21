@@ -1,7 +1,6 @@
 import 'package:electronic_approval/common/view/custom_filter_button.dart';
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
-import 'package:electronic_approval/common/view/custom_filter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
@@ -18,9 +17,6 @@ class DraftsScreen extends ConsumerStatefulWidget {
 
 class _DraftsScreenState extends ConsumerState<DraftsScreen> {
   final ScrollController _scrollController = ScrollController();
-  DocumentStatus? selectedStatus;
-  DateTime? selectedStartDate;
-  DateTime? selectedEndDate;
 
   @override
   void initState() {
@@ -39,29 +35,13 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
     super.dispose();
   }
 
-  List<Widget> _buildActiveFilterChips() {
-    return [
-      Text(selectedStatus?.statusText ?? ''),
-      Text(selectedStartDate?.toString() ?? ''),
-      Text(selectedEndDate?.toString() ?? ''),
-    ];
-  }
-
   void _showFilterScreen() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => DraftsFilterScreen(),
-    ).then((result) {
-      if (result != null && result is Map<String, dynamic>) {
-        setState(() {
-          selectedStatus = result['status'];
-          selectedStartDate = result['startDate'];
-          selectedEndDate = result['endDate'];
-        });
-      }
-    });
+    );
   }
 
   @override
@@ -84,7 +64,9 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
               SliverToBoxAdapter(
                 child: CustomFilterButton(
                   onPressed: _showFilterScreen,
-                  activeFilters: _buildActiveFilterChips(),
+                  filterCount: ref
+                      .read(draftsListNotifierProvider.notifier)
+                      .filterCount,
                 ),
               ),
               SliverList.builder(

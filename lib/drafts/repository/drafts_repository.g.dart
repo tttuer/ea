@@ -24,7 +24,7 @@ class _DraftsRepository implements DraftsRepository {
     int page = 1,
     int pageSize = 20,
     String? sort,
-    DocumentStatus? status,
+    String? status,
     String? startDate,
     String? endDate,
   }) async {
@@ -34,8 +34,8 @@ class _DraftsRepository implements DraftsRepository {
       r'page_size': pageSize,
       r'sort': sort,
       r'status': status,
-      r'start_date': startDate,
-      r'end_date': endDate,
+      r'start_at': startDate,
+      r'end_at': endDate,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{r'access_token': true};

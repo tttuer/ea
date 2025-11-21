@@ -114,6 +114,25 @@ enum DocumentStatus {
   const DocumentStatus(this.statusText, this.color);
 }
 
+extension DocumentStatusExtension on DocumentStatus {
+  String toQueryParam() {
+    switch (this) {
+      case DocumentStatus.draft:
+        return 'DRAFT';
+      case DocumentStatus.submitted:
+        return 'SUBMITTED';
+      case DocumentStatus.inProgress:
+        return 'IN_PROGRESS';
+      case DocumentStatus.approved:
+        return 'APPROVED';
+      case DocumentStatus.rejected:
+        return 'REJECTED';
+      case DocumentStatus.cancelled:
+        return 'CANCELLED';
+    }
+  }
+}
+
 enum ApprovalAction {
   @JsonValue('APPROVE')
   approve,

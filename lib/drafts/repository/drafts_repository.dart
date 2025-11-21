@@ -22,8 +22,8 @@ abstract class DraftsRepository {
     @Query('page') int page = 1,
     @Query('page_size') int pageSize = 20,
     @Query('sort') String? sort,
-    @Query('status') DocumentStatus? status,
-    @Query('start_date') String? startDate,
-    @Query('end_date') String? endDate,
+    @Query('status') String? status,
+    @Query('start_at') String? startDate,
+    @Query('end_at') String? endDate,
   });
 }

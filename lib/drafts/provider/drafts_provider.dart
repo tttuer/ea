@@ -12,6 +12,11 @@ final draftsListNotifierProvider =
 
 class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
   bool _isLoading = false;
+
+  DocumentStatus? selectedStatus;
+  DateTime? selectedStartDate;
+  DateTime? selectedEndDate;
+
   late final DraftsRepository _draftsRepository = ref.watch(
     draftsRepositoryProvider,
   );
@@ -19,7 +24,11 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
   @override
   Future<Pagination<Drafts>> build() async {
     state = await AsyncValue.guard(() async {
-      final response = await _draftsRepository.getDrafts();
+      final response = await _draftsRepository.getDrafts(
+        status: selectedStatus?.toQueryParam(),
+        startDate: _formatDate(selectedStartDate),
+        endDate: _formatDate(selectedEndDate),
+      );
       return response;
     });
 
@@ -34,9 +43,42 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
         );
   }
 
+  int get filterCount {
+    int filterCount = 0;
+    if (selectedStatus != null) {
+      filterCount++;
+    }
+    if (selectedStartDate != null || selectedEndDate != null) {
+      filterCount++;
+    }
+    return filterCount;
+  }
+
+  String? _formatDate(DateTime? date) {
+    if (date == null) {
+      return null;
+    }
+    return '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+  }
+
+  void setFilter(
+    DocumentStatus? status,
+    DateTime? startDate,
+    DateTime? endDate,
+  ) {
+    selectedStatus = status;
+    selectedStartDate = startDate;
+    selectedEndDate = endDate;
+    getDrafts();
+  }
+
   Future<void> getDrafts() async {
     state = await AsyncValue.guard(() async {
-      final response = await _draftsRepository.getDrafts();
+      final response = await _draftsRepository.getDrafts(
+        status: selectedStatus?.toQueryParam(),
+        startDate: _formatDate(selectedStartDate),
+        endDate: _formatDate(selectedEndDate),
+      );
       return response;
     });
   }
@@ -58,6 +100,9 @@ class DraftsListNotifier extends AsyncNotifier<Pagination<Drafts>> {
     try {
       final response = await _draftsRepository.getDrafts(
         page: currentData.page + 1,
+        status: selectedStatus?.toQueryParam(),
+        startDate: _formatDate(selectedStartDate),
+        endDate: _formatDate(selectedEndDate),
       );
       final newItems = [...currentData.items, ...response.items];
       final newPagination = currentData.copyWith(
