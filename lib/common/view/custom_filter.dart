@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
+import 'package:electronic_approval/common/view/custom_filter_button.dart';
 
 class CustomFilter extends StatelessWidget {
   const CustomFilter({super.key});
@@ -7,29 +8,19 @@ class CustomFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
-      height: 48,
+      height: 40,
       decoration: BoxDecoration(
-        color: Colors.blue,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(child: Wrap(spacing: 8, children: [])),
-          IconButton(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) => _FilterScreen(),
-                isScrollControlled: true,
-                useSafeArea: true,
-              );
-            },
-            icon: Icon(Icons.tune),
-          ),
-        ],
+      child: CustomFilterButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) => _FilterScreen(),
+          );
+        },
+        activeFilters: [],
       ),
     );
   }
