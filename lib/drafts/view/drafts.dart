@@ -1,3 +1,4 @@
+import 'package:electronic_approval/common/view/custom_filter_button.dart';
 import 'package:flutter/material.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
 import 'package:electronic_approval/common/view/custom_filter.dart';
@@ -6,6 +7,7 @@ import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
 import 'package:electronic_approval/common/pagination/pagination.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:electronic_approval/drafts/view/drafts_filter_screen.dart';
 
 class DraftsScreen extends ConsumerStatefulWidget {
   const DraftsScreen({super.key});
@@ -16,6 +18,10 @@ class DraftsScreen extends ConsumerStatefulWidget {
 
 class _DraftsScreenState extends ConsumerState<DraftsScreen> {
   final ScrollController _scrollController = ScrollController();
+  DocumentStatus? selectedStatus;
+  DateTime? selectedStartDate;
+  DateTime? selectedEndDate;
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +37,31 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  List<Widget> _buildActiveFilterChips() {
+    return [
+      Text(selectedStatus?.statusText ?? ''),
+      Text(selectedStartDate?.toString() ?? ''),
+      Text(selectedEndDate?.toString() ?? ''),
+    ];
+  }
+
+  void _showFilterScreen() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraftsFilterScreen(),
+    ).then((result) {
+      if (result != null && result is Map<String, dynamic>) {
+        setState(() {
+          selectedStatus = result['status'];
+          selectedStartDate = result['startDate'];
+          selectedEndDate = result['endDate'];
+        });
+      }
+    });
   }
 
   @override
@@ -50,7 +81,12 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
-              SliverToBoxAdapter(child: CustomFilter()),
+              SliverToBoxAdapter(
+                child: CustomFilterButton(
+                  onPressed: _showFilterScreen,
+                  activeFilters: _buildActiveFilterChips(),
+                ),
+              ),
               SliverList.builder(
                 itemBuilder: (context, index) {
                   return _DraftsItem(
