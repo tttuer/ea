@@ -47,12 +47,10 @@ Map<String, dynamic> _$DraftsToJson(Drafts instance) => <String, dynamic>{
 };
 
 const _$DocumentStatusEnumMap = {
-  DocumentStatus.draft: 'DRAFT',
   DocumentStatus.submitted: 'SUBMITTED',
   DocumentStatus.inProgress: 'IN_PROGRESS',
   DocumentStatus.approved: 'APPROVED',
   DocumentStatus.rejected: 'REJECTED',
-  DocumentStatus.cancelled: 'CANCELLED',
 };
 
 ApprovalHistory _$ApprovalHistoryFromJson(Map<String, dynamic> json) =>

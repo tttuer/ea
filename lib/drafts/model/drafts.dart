@@ -95,8 +95,6 @@ class ApprovalHistory {
 }
 
 enum DocumentStatus {
-  @JsonValue('DRAFT')
-  draft('기안', Colors.grey),
   @JsonValue('SUBMITTED')
   submitted('결재대기', Colors.yellow),
   @JsonValue('IN_PROGRESS')
@@ -104,9 +102,7 @@ enum DocumentStatus {
   @JsonValue('APPROVED')
   approved('결재완료', Color.fromARGB(255, 213, 213, 213)),
   @JsonValue('REJECTED')
-  rejected('반려', Colors.red),
-  @JsonValue('CANCELLED')
-  cancelled('취소', Colors.grey);
+  rejected('반려', Colors.red);
 
   final String statusText;
   final Color color;
@@ -117,8 +113,6 @@ enum DocumentStatus {
 extension DocumentStatusExtension on DocumentStatus {
   String toQueryParam() {
     switch (this) {
-      case DocumentStatus.draft:
-        return 'DRAFT';
       case DocumentStatus.submitted:
         return 'SUBMITTED';
       case DocumentStatus.inProgress:
@@ -127,8 +121,6 @@ extension DocumentStatusExtension on DocumentStatus {
         return 'APPROVED';
       case DocumentStatus.rejected:
         return 'REJECTED';
-      case DocumentStatus.cancelled:
-        return 'CANCELLED';
     }
   }
 }

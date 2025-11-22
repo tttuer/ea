@@ -20,6 +20,10 @@ class CustomFilterButton extends StatelessWidget {
         children: [
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
               side: BorderSide(color: Colors.grey.shade400),
               foregroundColor: hasActiveFilters ? Colors.white : Colors.black,
               backgroundColor: hasActiveFilters ? Colors.blue : Colors.white,

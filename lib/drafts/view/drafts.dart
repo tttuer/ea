@@ -196,7 +196,7 @@ class _SkeletonLoader extends StatelessWidget {
             icon: Icons.description_outlined,
             title: 'title',
             content: 'content',
-            status: DocumentStatus.draft,
+            status: DocumentStatus.submitted,
           ),
         );
       },

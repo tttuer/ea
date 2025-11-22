@@ -61,13 +61,20 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                             selected: filterState.selectedStatus == status,
                             backgroundColor: Colors.white,
                             selectedColor: Colors.blue,
-                            labelStyle: TextStyle(color: Colors.black),
+                            labelStyle: TextStyle(
+                              color: filterState.selectedStatus == status
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            checkmarkColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               side: BorderSide(color: Colors.grey.shade300),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             onSelected: (selected) {
-                              filterNotifier.setStatus(selected ? status : null);
+                              filterNotifier.setStatus(
+                                selected ? status : null,
+                              );
                             },
                           ),
                         ),
@@ -89,7 +96,8 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                               final date = await showDatePicker(
                                 context: context,
                                 initialDate:
-                                    filterState.selectedStartDate ?? DateTime.now(),
+                                    filterState.selectedStartDate ??
+                                    DateTime.now(),
                                 firstDate: DateTime(2001),
                                 lastDate: DateTime.now(),
                               );
@@ -120,7 +128,9 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
                             onPressed: () async {
                               final date = await showDatePicker(
                                 context: context,
-                                initialDate: filterState.selectedEndDate ?? DateTime.now(),
+                                initialDate:
+                                    filterState.selectedEndDate ??
+                                    DateTime.now(),
                                 firstDate: DateTime(2001),
                                 lastDate: DateTime.now(),
                               );
@@ -151,7 +161,9 @@ class _DraftsFilterScreenState extends ConsumerState<DraftsFilterScreen> {
               onApply: () {
                 if (filterState.selectedEndDate != null &&
                     filterState.selectedStartDate != null &&
-                    filterState.selectedEndDate!.isBefore(filterState.selectedStartDate!)) {
+                    filterState.selectedEndDate!.isBefore(
+                      filterState.selectedStartDate!,
+                    )) {
                   SnackBar snackBar = SnackBar(
                     duration: Duration(seconds: 2),
                     content: Text('종료일이 시작일보다 이전일 수 없습니다.'),
