@@ -23,7 +23,13 @@ final router = GoRouter(
               preferredSize: Size.fromHeight(1),
               child: Container(color: Colors.grey.shade300, height: 1),
             ),
-            actions: [IconButton(onPressed: () {}, icon: Icon(Icons.account_circle_outlined), iconSize: 30,)],
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.account_circle_outlined),
+                iconSize: 30,
+              ),
+            ],
           ),
           drawer: const _Drawer(),
           child: child,
@@ -78,6 +84,7 @@ class _Drawer extends StatelessWidget {
             ),
             onTap: () {
               context.goNamed('drafts');
+              Navigator.pop(context);
             },
           ),
           ListTile(
