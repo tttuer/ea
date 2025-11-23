@@ -26,4 +26,27 @@ abstract class DraftsRepository {
     @Query('start_at') String? startDate,
     @Query('end_at') String? endDate,
   });
+
+  /*
+    title: str = Form(...),
+    content: str = Form(...),
+    template_id: Optional[str] = Form(None),
+    form_data: Optional[str] = Form(None),
+    department_id: Optional[str] = Form(None),
+    approval_lines: Optional[str] = Form(None),
+    files: List[UploadFile] = File(default=[]),
+  */
+
+  @POST('')
+  @Headers({'access_token': true})
+  @MultiPart()
+  Future<Drafts> createDraft({
+    @Field('title') required String title,
+    @Field('content') required String content,
+    @Field('template_id') String? templateId,
+    @Field('form_data') String? formData,
+    @Field('department_id') String? departmentId,
+    @Field('approval_lines') String? approvalLines,
+    @Part(name: 'files') List<MultipartFile>? files,
+  });
 }

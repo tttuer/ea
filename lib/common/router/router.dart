@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:electronic_approval/drafts/view/drafts.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
+import 'package:electronic_approval/drafts/view/create_drafts_screen.dart';
 
 final router = GoRouter(
   routes: [
@@ -11,7 +12,7 @@ final router = GoRouter(
       builder: (context, state, child) {
         final routeName = state.topRoute?.name;
 
-        final titles = {'drafts': '기안함'};
+        final titles = {'drafts': '기안함', 'create-drafts': '결재 요청 작성'};
 
         return DefaultLayout(
           appBar: AppBar(
@@ -33,6 +34,11 @@ final router = GoRouter(
           path: '/drafts',
           name: 'drafts',
           builder: (context, state) => DraftsScreen(),
+        ),
+        GoRoute(
+          path: '/create-drafts',
+          name: 'create-drafts',
+          builder: (context, state) => CreateDraftsScreen(),
         ),
       ],
     ),

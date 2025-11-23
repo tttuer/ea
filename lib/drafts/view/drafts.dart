@@ -8,6 +8,7 @@ import 'package:electronic_approval/common/pagination/pagination.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:electronic_approval/drafts/view/drafts_filter_screen.dart';
 import 'package:electronic_approval/drafts/provider/drafts_filter_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class DraftsScreen extends ConsumerStatefulWidget {
   const DraftsScreen({super.key});
@@ -53,6 +54,15 @@ class _DraftsScreenState extends ConsumerState<DraftsScreen> {
         child: CustomScrollView(slivers: [_SkeletonLoader(itemCount: 10)]),
       ),
       data: (Pagination<Drafts> data) => DefaultLayout(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          shape: CircleBorder(),
+          onPressed: () {
+            context.pushNamed('create-drafts');
+          },
+          child: Icon(Icons.add),
+        ),
         child: RefreshIndicator(
           backgroundColor: Colors.white,
           color: Colors.blue,

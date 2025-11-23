@@ -4,11 +4,15 @@ class DefaultLayout extends StatelessWidget {
   final Widget child;
   final PreferredSizeWidget? appBar;
   final Widget? drawer;
+  final Widget? floatingActionButton;
+
+
   const DefaultLayout({
     super.key,
     required this.child,
     this.appBar,
     this.drawer,
+    this.floatingActionButton,
   });
 
   @override
@@ -18,6 +22,7 @@ class DefaultLayout extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: appBar,
       drawer: drawer,
+      floatingActionButton: floatingActionButton,
     );
   }
 }
