@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:electronic_approval/drafts/model/approver_line.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/drafts/provider/create_drafts_state.dart';
 import 'package:electronic_approval/drafts/repository/drafts_repository.dart';
@@ -34,7 +37,47 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
   }
 
   void removeFile(String? file) {
-    state = state.copyWith(files: state.files?.where((f) => f != file).toList());
+    state = state.copyWith(
+      files: state.files?.where((f) => f != file).toList(),
+    );
+  }
+
+  void addApprover(ApproverLine approverLine) {
+    final currentApproverLines = state.approverLines ?? [];
+    state = state.copyWith(
+      approverLines: [...currentApproverLines, approverLine],
+    );
+  }
+
+  void removeApprover(ApproverLine approverLine) {
+    final currentApproverLines = state.approverLines ?? [];
+    state = state.copyWith(
+      approverLines: currentApproverLines
+          .where((a) => a.approverUserId != approverLine.approverUserId)
+          .toList(),
+    );
+  }
+
+  void redorderApprover(int fromIndex, int toIndex) {
+    final currentApproverLines = state.approverLines ?? [];
+    final approverLine = currentApproverLines[fromIndex];
+    currentApproverLines.removeAt(fromIndex);
+    currentApproverLines.insert(toIndex, approverLine);
+
+    final reorderedApprovderLines = currentApproverLines.asMap().entries.map((
+      entry,
+    ) {
+      return ApproverLine(
+        approverId: entry.value.approverId,
+        approverUserId: entry.value.approverUserId,
+        approverName: entry.value.approverName,
+        stepOrder: entry.key,
+        isRequired: entry.value.isRequired,
+        isParallel: entry.value.isParallel,
+      );
+    }).toList();
+
+    state = state.copyWith(approverLines: reorderedApprovderLines);
   }
 
   void reset() {
@@ -60,6 +103,11 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
         title: state.title,
         content: state.content,
         files: files,
+        approvalLines: state.approverLines != null
+            ? jsonEncode(
+                state.approverLines!.map((line) => line.toJson()).toList(),
+              )
+            : null,
       );
 
       reset();
