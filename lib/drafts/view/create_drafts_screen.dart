@@ -13,12 +13,96 @@ class CreateDraftsScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
+  final PageController _pageController = PageController();
+  int _currentStep = 0;
+
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(createDraftsProvider);
+    _titleController = TextEditingController(text: state.title);
+    _contentController = TextEditingController(text: state.content);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    return DefaultLayout(
+      child: Column(
+        children: [
+          _buildStepIndicator(),
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              physics: NeverScrollableScrollPhysics(),
+              children: [_buildStep1(), _buildStep2(), _buildStep3()],
+            ),
+          ),
+          _buildBottomButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepIndicator() {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: [
+          _stepCircle(1, _currentStep >= 0),
+          _stepLine(_currentStep >= 1),
+          _stepCircle(2, _currentStep >= 1),
+          _stepLine(_currentStep >= 2),
+          _stepCircle(3, _currentStep >= 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _stepCircle(int step, bool isActive) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: isActive ? Colors.blue : Colors.grey.shade300,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          '$step',
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.grey,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _stepLine(bool isActive) {
+    return Expanded(
+      child: Container(
+        height: 2,
+        color: isActive ? Colors.blue : Colors.grey.shade300,
+      ),
+    );
+  }
+
+  Widget _buildStep1() {
     final state = ref.watch(createDraftsProvider);
     final notifier = ref.read(createDraftsProvider.notifier);
 
-    return DefaultLayout(
+    return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -28,6 +112,7 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
             Text('제목'),
             SizedBox(height: 8),
             TextField(
+              controller: _titleController,
               decoration: InputDecoration(
                 hintText: '결재 제목을 입력해주세요.',
                 alignLabelWithHint: true,
@@ -47,6 +132,7 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
             Text('내용'),
             SizedBox(height: 8),
             TextField(
+              controller: _contentController,
               maxLines: null,
               minLines: 5,
               decoration: InputDecoration(
@@ -83,7 +169,7 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                 ],
               ),
             ),
-
+      
             if (state.files != null && state.files!.isNotEmpty)
               ...state.files!.map(
                 (file) => ListTile(
@@ -97,18 +183,92 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                   ),
                 ),
               ),
-
+      
             SizedBox(height: 16),
-            CustomButton(
-              onPressed: () async {
-                await _checkCreateDraft();
-              },
-              child: Text('다음'),
-            ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildStep2() {
+    return Column(
+      children: [
+        Text('결재자'),
+        SizedBox(height: 8),
+        TextField(decoration: InputDecoration(hintText: '결재자를 입력해주세요.')),
+      ],
+    );
+  }
+
+  Widget _buildStep3() {
+    return Column(
+      children: [
+        Text('확인'),
+        SizedBox(height: 8),
+        TextField(decoration: InputDecoration(hintText: '결재자를 입력해주세요.')),
+      ],
+    );
+  }
+
+  Widget _buildBottomButtons() {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: [
+          if (_currentStep > 0)
+            Expanded(
+              child: CustomButton(onPressed: _previousStep, child: Text('이전')),
+            ),
+          if (_currentStep > 0) SizedBox(width: 8),
+          Expanded(
+            child: CustomButton(
+              onPressed: _currentStep == 2 ? _submit : _nextStep,
+              child: Text(_currentStep == 2 ? '제출' : '다음'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _nextStep() async {
+    final state = ref.read(createDraftsProvider);
+    if (_currentStep == 0) {
+      if (state.title.isEmpty || state.content.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('제목과 내용을 입력해주세요.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+
+    setState(() {
+      _currentStep++;
+    });
+    _pageController.nextPage(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _submit() async {
+    ref.read(createDraftsProvider.notifier).createDraft();
+  }
+
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep--;
+      });
+      _pageController.previousPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   Future<void> _checkCreateDraft() async {
@@ -126,7 +286,7 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
   }
 
   Future<void> _pickFiles() async {
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result != null) {
       ref
           .read(createDraftsProvider.notifier)
