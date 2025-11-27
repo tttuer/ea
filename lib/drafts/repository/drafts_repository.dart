@@ -27,16 +27,6 @@ abstract class DraftsRepository {
     @Query('end_at') String? endDate,
   });
 
-  /*
-    title: str = Form(...),
-    content: str = Form(...),
-    template_id: Optional[str] = Form(None),
-    form_data: Optional[str] = Form(None),
-    department_id: Optional[str] = Form(None),
-    approval_lines: Optional[str] = Form(None),
-    files: List[UploadFile] = File(default=[]),
-  */
-
   @POST('')
   @Headers({'access_token': true})
   @MultiPart()
