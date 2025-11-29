@@ -36,6 +36,10 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
     state = state.copyWith(isSubmitting: isSubmitting);
   }
 
+  void setApproverLines(List<ApproverLine>? approverLines) {
+    state = state.copyWith(approverLines: approverLines);
+  }
+
   void removeFile(String? file) {
     state = state.copyWith(
       files: state.files?.where((f) => f != file).toList(),
@@ -56,6 +60,20 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
           .where((a) => a.approverUserId != approverLine.approverUserId)
           .toList(),
     );
+    
+    final reorderedApprovderLines = state.approverLines?.asMap()
+    .entries
+    .map((entry) => ApproverLine(
+      approverId: entry.value.approverId,
+      approverUserId: entry.value.approverUserId,
+      approverName: entry.value.approverName,
+      stepOrder: entry.key,
+      isRequired: entry.value.isRequired,
+      isParallel: entry.value.isParallel,
+    ))
+    .toList();
+
+    state = state.copyWith(approverLines: reorderedApprovderLines);
   }
 
   void redorderApprover(int fromIndex, int toIndex) {

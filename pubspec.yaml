@@ -45,6 +45,7 @@ dependencies:
   freezed_annotation: ^3.1.0
   skeletonizer: ^2.1.0+1
   file_picker: ^10.3.7
+  riverpod_annotation: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -56,9 +57,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  retrofit_generator: ^10.0.1
+  retrofit_generator: ^10.0.0
   build_runner: ^2.6.0
   json_serializable: ^6.10.0
+  riverpod_generator: ^3.0.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

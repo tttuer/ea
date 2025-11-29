@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart' hide Headers;
+import 'package:electronic_approval/drafts/model/favorite_group.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:electronic_approval/drafts/model/drafts.dart';
 import 'package:electronic_approval/common/pagination/pagination.dart';
@@ -9,14 +10,14 @@ part 'drafts_repository.g.dart';
 
 final draftsRepositoryProvider = Provider<DraftsRepository>((ref) {
   final dio = ref.watch(dioProvider);
-  return DraftsRepository(dio, baseUrl: '${dio.options.baseUrl}/approvals');
+  return DraftsRepository(dio, baseUrl: '${dio.options.baseUrl}');
 });
 
 @RestApi()
 abstract class DraftsRepository {
   factory DraftsRepository(Dio dio, {required String baseUrl}) = _DraftsRepository;
 
-  @GET('')
+  @GET('/approvals')
   @Headers({'access_token': true})
   Future<Pagination<Drafts>> getDrafts({
     @Query('page') int page = 1,
@@ -27,7 +28,7 @@ abstract class DraftsRepository {
     @Query('end_at') String? endDate,
   });
 
-  @POST('')
+  @POST('/approvals')
   @Headers({'access_token': true})
   @MultiPart()
   Future<Drafts> createDraft({
@@ -39,4 +40,8 @@ abstract class DraftsRepository {
     @Field('approval_lines') String? approvalLines,
     @Part(name: 'files') List<MultipartFile>? files,
   });
+
+  @GET('/approval-lines/favorite-groups')
+  @Headers({'access_token': true})
+  Future<List<FavoriteGroup>> getFavoriteGroups();
 }

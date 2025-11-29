@@ -1,9 +1,11 @@
+import 'package:electronic_approval/drafts/model/approver_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:electronic_approval/drafts/provider/create_drafts_provider.dart';
 import 'package:electronic_approval/common/view/custom_button.dart';
+import 'package:electronic_approval/drafts/provider/favorite_group_provider.dart';
 
 class CreateDraftsScreen extends ConsumerStatefulWidget {
   const CreateDraftsScreen({super.key});
@@ -169,21 +171,36 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                 ],
               ),
             ),
-      
+
             if (state.files != null && state.files!.isNotEmpty)
               ...state.files!.map(
-                (file) => ListTile(
-                  leading: Icon(Icons.attach_file),
-                  title: Text(file ?? ''),
-                  trailing: IconButton(
-                    onPressed: () {
-                      ref.read(createDraftsProvider.notifier).removeFile(file);
-                    },
-                    icon: Icon(Icons.delete),
+                (file) => Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Colors.grey.shade400,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: ListTile(
+                      leading: Icon(Icons.attach_file),
+                      title: Text(_getFileName(file)),
+                      trailing: IconButton(
+                        onPressed: () {
+                          ref
+                              .read(createDraftsProvider.notifier)
+                              .removeFile(file);
+                        },
+                        icon: Icon(Icons.delete),
+                      ),
+                    ),
                   ),
                 ),
               ),
-      
+
             SizedBox(height: 16),
           ],
         ),
@@ -191,13 +208,154 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
     );
   }
 
+  String _getFileName(String? filePath) {
+    if (filePath == null) return '';
+    return filePath.split('/').last;
+  }
+
   Widget _buildStep2() {
-    return Column(
-      children: [
-        Text('결재자'),
-        SizedBox(height: 8),
-        TextField(decoration: InputDecoration(hintText: '결재자를 입력해주세요.')),
-      ],
+    final favoriteGroups = ref.watch(getFavoriteGroupsProvider);
+    final state = ref.watch(createDraftsProvider);
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text('결재선 그룹'),
+            SizedBox(height: 8),
+            favoriteGroups.when(
+              loading: () => DropdownButtonFormField(
+                items: [
+                  DropdownMenuItem(
+                    value: null,
+                    child: CircularProgressIndicator(),
+                  ),
+                ],
+                onChanged: (value) {},
+              ),
+              error: (error, stackTrace) => Text('Error: $error'),
+              data: (data) => DropdownButtonFormField(
+                dropdownColor: Colors.white,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue),
+                  ),
+                ),
+                hint: Text('결재선 그룹을 선택해주세요.'),
+                items: data
+                    .map(
+                      (group) => DropdownMenuItem(
+                        value: group.id,
+                        child: Text(group.name),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (selectedId) {
+                  final selectedGroup = data.firstWhere(
+                    (group) => group.id == selectedId,
+                  );
+
+                  final approverLines = selectedGroup.approverIds
+                      .asMap()
+                      .entries
+                      .map(
+                        (entry) => ApproverLine(
+                          approverId: '',
+                          approverUserId: selectedGroup.approverIds[entry.key],
+                          approverName: selectedGroup.approverNames[entry.key],
+                          stepOrder: entry.key,
+                          isRequired: true,
+                          isParallel: false,
+                        ),
+                      )
+                      .toList();
+
+                  ref
+                      .read(createDraftsProvider.notifier)
+                      .setApproverLines(approverLines);
+                },
+              ),
+            ),
+            SizedBox(height: 24),
+            Divider(thickness: 1, color: Colors.grey.shade300),
+            SizedBox(height: 16),
+            Text('결재선'),
+
+            if (state.approverLines != null && state.approverLines!.isNotEmpty)
+              ReorderableListView(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                buildDefaultDragHandles: false,
+                onReorder: (oldIndex, newIndex) {
+                  ref
+                      .read(createDraftsProvider.notifier)
+                      .redorderApprover(oldIndex, newIndex);
+                },
+                children: [
+                  ...state.approverLines!.map(
+                    (line) => Card(
+                      key: ValueKey(line.approverUserId),
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 2,
+                      child: ListTile(
+                        leading: IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.drag_indicator),
+                        ),
+                        title: Text(line.approverName),
+                        trailing: IconButton(
+                          onPressed: () {
+                            ref
+                                .read(createDraftsProvider.notifier)
+                                .removeApprover(line);
+                          },
+                          icon: Icon(Icons.delete),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+            // // if (state.approverLines != null && state.approverLines!.isNotEmpty)
+            // //   ...state.approverLines!.map(
+            // //     (line) => ReorderableListView(
+            // //       onReorder: (oldIndex, newIndex) {
+            // //         ref.read(createDraftsProvider.notifier).redorderApprover(oldIndex, newIndex);
+            // //       },
+            // //       children: [
+            // //         Card(
+            // //         color: Colors.white,
+            // //         shape: RoundedRectangleBorder(
+            // //           borderRadius: BorderRadius.circular(10),
+            // //         ),
+            // //         elevation: 2,
+            // //         child: ListTile(
+            // //           leading: IconButton(onPressed: () {}, icon: Icon(Icons.drag_indicator)),
+            // //           title: Text(line.approverName),
+            // //           trailing: IconButton(
+            // //             onPressed: () {
+            // //               ref.read(createDraftsProvider.notifier).removeApprover(line);
+            // //             },
+            // //             icon: Icon(Icons.delete),
+            // //           ),
+            // //         ),
+            // //       ),
+            // //     ),
+            //   ),
+          ],
+        ),
+      ),
     );
   }
 
