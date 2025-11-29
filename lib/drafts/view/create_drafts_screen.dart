@@ -285,34 +285,74 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
             ),
             SizedBox(height: 24),
             Divider(thickness: 1, color: Colors.grey.shade300),
-            SizedBox(height: 16),
-            Text('결재선'),
+            SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('결재선'),
+                IconButton(
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    // ref.read(createDraftsProvider.notifier).addApprover();
+                  },
+                  icon: Icon(Icons.add, color: Colors.white),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
 
             if (state.approverLines != null && state.approverLines!.isNotEmpty)
               ReorderableListView(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 buildDefaultDragHandles: false,
+                proxyDecorator: (child, index, animation) => AnimatedBuilder(
+                  animation: animation,
+                  builder: (context, child) => Material(
+                    color: Colors.transparent,
+                    child: child,
+                  ),
+                  child: Opacity(opacity: 0.8, child: child),
+                ),
                 onReorder: (oldIndex, newIndex) {
+                  if (oldIndex < newIndex) {
+                    newIndex--;
+                  }
                   ref
                       .read(createDraftsProvider.notifier)
                       .redorderApprover(oldIndex, newIndex);
                 },
-                children: [
-                  ...state.approverLines!.map(
-                    (line) => Card(
-                      key: ValueKey(line.approverUserId),
+                children: state.approverLines!.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final line = entry.value;
+
+                  return Padding(
+                    key: ValueKey(line.approverUserId),
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       elevation: 2,
                       child: ListTile(
-                        leading: IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.drag_indicator),
+                        leading: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ReorderableDragStartListener(
+                              index: index,
+                              child: Icon(Icons.drag_indicator),
+                            ),
+                            SizedBox(width: 8),
+                          ],
                         ),
                         title: Text(line.approverName),
+                        subtitle: Text('${line.stepOrder + 1} 단계'),
                         trailing: IconButton(
                           onPressed: () {
                             ref
@@ -323,36 +363,9 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
-
-            // // if (state.approverLines != null && state.approverLines!.isNotEmpty)
-            // //   ...state.approverLines!.map(
-            // //     (line) => ReorderableListView(
-            // //       onReorder: (oldIndex, newIndex) {
-            // //         ref.read(createDraftsProvider.notifier).redorderApprover(oldIndex, newIndex);
-            // //       },
-            // //       children: [
-            // //         Card(
-            // //         color: Colors.white,
-            // //         shape: RoundedRectangleBorder(
-            // //           borderRadius: BorderRadius.circular(10),
-            // //         ),
-            // //         elevation: 2,
-            // //         child: ListTile(
-            // //           leading: IconButton(onPressed: () {}, icon: Icon(Icons.drag_indicator)),
-            // //           title: Text(line.approverName),
-            // //           trailing: IconButton(
-            // //             onPressed: () {
-            // //               ref.read(createDraftsProvider.notifier).removeApprover(line);
-            // //             },
-            // //             icon: Icon(Icons.delete),
-            // //           ),
-            // //         ),
-            // //       ),
-            // //     ),
-            //   ),
           ],
         ),
       ),
