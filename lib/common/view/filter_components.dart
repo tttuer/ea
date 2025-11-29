@@ -35,6 +35,9 @@ class FilterBottomButtons extends StatelessWidget {
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Colors.grey.shade300),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               foregroundColor: Colors.black,
             ),
             onPressed: onReset,
@@ -46,6 +49,9 @@ class FilterBottomButtons extends StatelessWidget {
           child: ElevatedButton(
             onPressed: onApply,
             style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
             ),
