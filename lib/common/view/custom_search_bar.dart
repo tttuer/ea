@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatefulWidget {
+  final String? hintText;
   final String? initialValue;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onSearch;
-  const CustomSearchBar({super.key, this.initialValue, this.onChanged, this.onSearch});
+  const CustomSearchBar({super.key, this.hintText, this.initialValue, this.onChanged, this.onSearch});
 
   @override
   State<CustomSearchBar> createState() => _CustomSearchBarState();
@@ -28,7 +29,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
       padding: EdgeInsets.all(16),
       child: TextField(
         decoration: InputDecoration(
-          hintText: '검색어를 입력해주세요.',
+          hintText: widget.hintText ?? '검색어를 입력해주세요.',
           prefixIcon: Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

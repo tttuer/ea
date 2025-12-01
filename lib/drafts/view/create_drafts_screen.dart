@@ -1,4 +1,5 @@
 import 'package:electronic_approval/drafts/model/approver_line.dart';
+import 'package:electronic_approval/drafts/view/search_user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/common/view/default_layout.dart';
@@ -298,7 +299,7 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                     ),
                   ),
                   onPressed: () {
-                    // ref.read(createDraftsProvider.notifier).addApprover();
+                    _showSearchUserScreen();
                   },
                   icon: Icon(Icons.add, color: Colors.white),
                 ),
@@ -313,10 +314,8 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                 buildDefaultDragHandles: false,
                 proxyDecorator: (child, index, animation) => AnimatedBuilder(
                   animation: animation,
-                  builder: (context, child) => Material(
-                    color: Colors.transparent,
-                    child: child,
-                  ),
+                  builder: (context, child) =>
+                      Material(color: Colors.transparent, child: child),
                   child: Opacity(opacity: 0.8, child: child),
                 ),
                 onReorder: (oldIndex, newIndex) {
@@ -369,6 +368,15 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showSearchUserScreen() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => SearchUserScreen(),
     );
   }
 
