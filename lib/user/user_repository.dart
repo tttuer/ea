@@ -41,4 +41,9 @@ abstract class UserRepository {
     @Field('user_id') required String userId,
     @Field('password') required String password,
   });
+
+  @GET('/search')
+  Future<HttpResponse<List<UserResponse>>> search({
+    @Query('name') required String name,
+  });
 }

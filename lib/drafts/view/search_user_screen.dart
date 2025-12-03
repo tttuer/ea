@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/common/view/custom_search_bar.dart';
 import 'dart:async';
+import 'package:electronic_approval/user/provider/user_search_provider.dart';
 
 class SearchUserScreen extends ConsumerStatefulWidget {
   const SearchUserScreen({super.key});
@@ -75,7 +76,12 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
 
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(Duration(milliseconds: 500), () {
-      print('검색: $_searchQuery');
+      _performSearch(_searchQuery);
     });
+  }
+
+  void _performSearch(String query) async {
+    if (query.isEmpty) return;
+    await ref.read(userSearchNotifierProvider.notifier).search(name: query);
   }
 }
