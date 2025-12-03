@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/common/view/custom_search_bar.dart';
+import 'dart:async';
 
 class SearchUserScreen extends ConsumerStatefulWidget {
   const SearchUserScreen({super.key});
@@ -10,6 +11,14 @@ class SearchUserScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
+  String _searchQuery = '';
+  Timer? _debounce;
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,7 +57,7 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
           CustomSearchBar(
             hintText: '이름 검색',
             onChanged: (value) {
-              print(value);
+              _onSearchChanged(value);
             },
             onSearch: () {
               print('검색');
@@ -57,5 +66,16 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
         ],
       ),
     );
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      _searchQuery = value;
+    });
+
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(Duration(milliseconds: 500), () {
+      print('검색: $_searchQuery');
+    });
   }
 }
