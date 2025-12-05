@@ -43,6 +43,7 @@ abstract class UserRepository {
   });
 
   @GET('/search')
+  @Headers({'access_token': true})
   Future<HttpResponse<List<UserResponse>>> search({
     @Query('name') required String name,
   });

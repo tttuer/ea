@@ -7,8 +7,11 @@ part 'user_response.g.dart';
 class UserResponse {
   final String id;
   final String name;
+  @JsonKey(name: 'user_id')
   final String userId;
+  @JsonKey(name: 'created_at')
   final String createdAt;
+  @JsonKey(name: 'updated_at')
   final String updatedAt;
   final List<Role> roles;
 

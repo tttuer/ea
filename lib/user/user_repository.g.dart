@@ -150,7 +150,8 @@ class _UserRepository implements UserRepository {
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'name': name};
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<List<UserResponse>>>(
       Options(method: 'GET', headers: _headers, extra: _extra)

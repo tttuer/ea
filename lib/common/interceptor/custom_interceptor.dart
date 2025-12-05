@@ -20,6 +20,12 @@ class CustomInterceptor extends Interceptor {
       options.headers.addAll({'authorization': 'Bearer $accessToken'});
     }
 
+    if (options.extra['retried'] == true) {
+      return handler.reject(
+        DioException(requestOptions: options, message: 'Retried'),
+      );
+    }
+
     handler.next(options);
   }
 

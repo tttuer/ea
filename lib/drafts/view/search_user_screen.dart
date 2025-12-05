@@ -22,6 +22,8 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userSearchState = ref.watch(userSearchNotifierProvider);
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
@@ -61,9 +63,31 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
               _onSearchChanged(value);
             },
             onSearch: () {
-              print('검색');
+              _performSearch(_searchQuery);
             },
           ),
+          SizedBox(height: 8),
+          if (userSearchState.value != null &&
+              userSearchState.value!.isNotEmpty)
+            ...userSearchState.value!.map(
+              (user) => Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 8.0,
+                  left: 16.0,
+                  right: 16.0,
+                ),
+                child: Card(
+                  child: ListTile(
+                    title: Text(user.name),
+                    subtitle: Text(user.userId),
+                    trailing: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.delete),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
