@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:electronic_approval/common/view/custom_search_bar.dart';
 import 'dart:async';
 import 'package:electronic_approval/user/provider/user_search_provider.dart';
+import 'package:electronic_approval/user/model/user_response.dart';
+import 'package:electronic_approval/common/view/custom_autocomplete_search.dart';
 
 class SearchUserScreen extends ConsumerStatefulWidget {
   const SearchUserScreen({super.key});
@@ -12,14 +14,7 @@ class SearchUserScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
-  String _searchQuery = '';
-  Timer? _debounce;
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
-  }
-
+  List<UserResponse> _selectedUsers = [];
   @override
   Widget build(BuildContext context) {
     final userSearchState = ref.watch(userSearchNotifierProvider);
@@ -57,55 +52,65 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
             child: Text('결재자 추가'),
           ),
           SizedBox(height: 4),
-          CustomSearchBar(
-            hintText: '이름 검색',
-            onChanged: (value) {
-              _onSearchChanged(value);
-            },
-            onSearch: () {
-              _performSearch(_searchQuery);
-            },
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomAutocompleteSearch<UserResponse>(
+              optionsBuilder: (TextEditingValue textEditingValue) async {
+                return await ref
+                    .read(userSearchNotifierProvider.notifier)
+                    .search(name: textEditingValue.text);
+              },
+              displayStringForOption: (UserResponse user) => user.name,
+              onSelected: (UserResponse user) {
+                if (!_selectedUsers.any(
+                  (element) => element.userId == user.userId,
+                )) {
+                  setState(() {
+                    _selectedUsers.add(user);
+                  });
+                }
+              },
+            ),
           ),
           SizedBox(height: 8),
-          if (userSearchState.value != null &&
-              userSearchState.value!.isNotEmpty)
-            ...userSearchState.value!.map(
-              (user) => Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 8.0,
-                  left: 16.0,
-                  right: 16.0,
-                ),
-                child: Card(
-                  child: ListTile(
-                    title: Text(user.name),
-                    subtitle: Text(user.userId),
-                    trailing: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.delete),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ..._selectedUsers.map(
+                  (user) => Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      bottom: 8.0,
+                    ),
+                    child: Card(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 2,
+                      child: ListTile(
+                        title: Text(user.name),
+                        trailing: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedUsers.removeWhere(
+                                (element) => element.userId == user.userId,
+                              );
+                            });
+                          },
+                          icon: Icon(Icons.delete, color: Colors.red),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
+          ),
         ],
       ),
     );
-  }
-
-  void _onSearchChanged(String value) {
-    setState(() {
-      _searchQuery = value;
-    });
-
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(Duration(milliseconds: 500), () {
-      _performSearch(_searchQuery);
-    });
-  }
-
-  void _performSearch(String query) async {
-    if (query.isEmpty) return;
-    await ref.read(userSearchNotifierProvider.notifier).search(name: query);
   }
 }
