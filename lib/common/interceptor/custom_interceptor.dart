@@ -34,8 +34,8 @@ class CustomInterceptor extends Interceptor {
     var is401Error = err.response?.statusCode == 401;
     var path = err.requestOptions.path;
 
-    final isLoginPath = path == '/api/users/login';
-    final isRefreshPath = path == '/api/users/refresh';
+    final isLoginPath = path == '/login';
+    final isRefreshPath = path == '/refresh';
 
     if (is401Error && (isLoginPath || isRefreshPath)) {
       return handler.reject(err);
@@ -57,8 +57,10 @@ class CustomInterceptor extends Interceptor {
       );
 
       final accessToken = resp.data['access_token'];
+      final newRefreshToken = resp.data['refresh_token'];
 
       _token.saveAccessToken(accessToken);
+      _token.saveRefreshToken(newRefreshToken);
 
       options.headers.addAll({'authorization': 'Bearer $accessToken'});
 

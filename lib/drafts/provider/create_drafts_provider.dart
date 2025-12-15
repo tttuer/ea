@@ -48,8 +48,24 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
 
   void addApprover(ApproverLine approverLine) {
     final currentApproverLines = state.approverLines ?? [];
+    if (currentApproverLines.any((a) => a.approverUserId == approverLine.approverUserId)) {
+      return;
+    }
     state = state.copyWith(
       approverLines: [...currentApproverLines, approverLine],
+    );
+  }
+
+  void addApprovers(List<ApproverLine> approverLines) {
+    final currentApproverLines = state.approverLines ?? [];
+    for (var approverLine in approverLines) {
+      if (currentApproverLines.any((a) => a.approverUserId == approverLine.approverUserId)) {
+        continue;
+      }
+      currentApproverLines.add(approverLine);
+    }
+    state = state.copyWith(
+      approverLines: currentApproverLines,
     );
   }
 

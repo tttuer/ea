@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:electronic_approval/common/view/custom_search_bar.dart';
-import 'dart:async';
 import 'package:electronic_approval/user/provider/user_search_provider.dart';
 import 'package:electronic_approval/user/model/user_response.dart';
 import 'package:electronic_approval/common/view/custom_autocomplete_search.dart';
+import 'package:electronic_approval/common/view/custom_button.dart';
+import 'package:electronic_approval/drafts/provider/create_drafts_provider.dart';
+import 'package:electronic_approval/drafts/model/approver_line.dart';
 
 class SearchUserScreen extends ConsumerStatefulWidget {
   const SearchUserScreen({super.key});
@@ -74,39 +75,93 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
           ),
           SizedBox(height: 8),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ..._selectedUsers.map(
-                  (user) => Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16.0,
-                      right: 16.0,
-                      bottom: 8.0,
-                    ),
-                    child: Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 2,
-                      child: ListTile(
-                        title: Text(user.name),
-                        trailing: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedUsers.removeWhere(
-                                (element) => element.userId == user.userId,
-                              );
-                            });
-                          },
-                          icon: Icon(Icons.delete, color: Colors.red),
-                        ),
-                      ),
+            child: ListView.builder(
+              itemCount: _selectedUsers.length,
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  bottom: 8.0,
+                ),
+                child: Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 2,
+                  child: ListTile(
+                    title: Text(_selectedUsers[index].name),
+                    trailing: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _selectedUsers.removeWhere(
+                            (element) =>
+                                element.userId == _selectedUsers[index].userId,
+                          );
+                        });
+                      },
+                      icon: Icon(Icons.delete, color: Colors.red),
                     ),
                   ),
                 ),
+              ),
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: Offset(0, -2),
+                ),
               ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      backgroundColor: Colors.grey.shade300,
+                      foregroundColor: Colors.black,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('취소'),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: CustomButton(
+                      onPressed: () {
+                        final currentApprovers =
+                            ref.read(createDraftsProvider).approverLines ?? [];
+                        final newApprovers = _selectedUsers
+                            .map(
+                              (user) => ApproverLine(
+                                approverId: '',
+                                approverUserId: user.userId,
+                                approverName: user.name,
+                                stepOrder: currentApprovers.length,
+                                isRequired: true,
+                                isParallel: false,
+                              ),
+                            )
+                            .toList();
+
+                        ref
+                            .read(createDraftsProvider.notifier)
+                            .addApprovers(newApprovers);
+                        Navigator.pop(context);
+                      },
+                      child: Text('확인'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
