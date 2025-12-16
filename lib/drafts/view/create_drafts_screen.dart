@@ -381,12 +381,98 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
   }
 
   Widget _buildStep3() {
-    return Column(
-      children: [
-        Text('확인'),
-        SizedBox(height: 8),
-        TextField(decoration: InputDecoration(hintText: '결재자를 입력해주세요.')),
-      ],
+    final state = ref.watch(createDraftsProvider);
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              '결재선 (${state.approverLines?.length ?? 0})',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            if (state.approverLines != null && state.approverLines!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: state.approverLines!.length,
+                  itemBuilder: (context, index) {
+                    final approverLine = state.approverLines![index];
+                    return Card(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                        title: Text(approverLine.approverName),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            Divider(thickness: 1, color: Colors.grey.shade400),
+            SizedBox(height: 8),
+            Text(
+              '제목',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(state.title),
+            ),
+            SizedBox(height: 8),
+            Text(
+              '내용',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(state.content),
+            ),
+            SizedBox(height: 8),
+            if (state.files != null && state.files!.isNotEmpty) ...[
+              Text(
+                '첨부파일 (${state.files?.length ?? 0})',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              ...state.files!.map(
+                (file) => Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.attach_file,
+                      color: Colors.indigoAccent,
+                    ),
+                    title: Text(_getFileName(file)),
+                    trailing: IconButton(
+                      icon: Icon(Icons.download),
+                      onPressed: () {},
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 
@@ -420,6 +506,13 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
             content: Text('제목과 내용을 입력해주세요.'),
             backgroundColor: Colors.red,
           ),
+        );
+        return;
+      }
+    } else if (_currentStep == 1) {
+      if (state.approverLines == null || state.approverLines!.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('결재선을 선택해주세요.'), backgroundColor: Colors.red),
         );
         return;
       }
