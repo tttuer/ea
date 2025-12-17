@@ -34,8 +34,10 @@ class CustomInterceptor extends Interceptor {
     var is401Error = err.response?.statusCode == 401;
     var path = err.requestOptions.path;
 
-    final isLoginPath = path == '/login';
-    final isRefreshPath = path == '/refresh';
+    final isLoginPath = path == '/users/login';
+    final isRefreshPath = path == '/users/refresh';
+    print('access_token: ${err.requestOptions.headers['access_token']}');
+    print('refresh_token: ${err.requestOptions.headers['refresh_token']}');
 
     if (is401Error && (isLoginPath || isRefreshPath)) {
       return handler.reject(err);

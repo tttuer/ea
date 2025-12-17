@@ -78,15 +78,24 @@ class _DraftsRepository implements DraftsRepository {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
-    final _data = {
-      'title': title,
-      'content': content,
-      'template_id': templateId,
-      'form_data': formData,
-      'department_id': departmentId,
-      'approval_lines': approvalLines,
-    };
-    _data.removeWhere((k, v) => v == null);
+    final _data = FormData();
+    _data.fields.add(MapEntry('title', title));
+    _data.fields.add(MapEntry('content', content));
+    if (templateId != null) {
+      _data.fields.add(MapEntry('template_id', templateId));
+    }
+    if (formData != null) {
+      _data.fields.add(MapEntry('form_data', formData));
+    }
+    if (departmentId != null) {
+      _data.fields.add(MapEntry('department_id', departmentId));
+    }
+    if (approvalLines != null) {
+      _data.fields.add(MapEntry('approval_lines', approvalLines));
+    }
+    if (files != null) {
+      _data.files.addAll(files.map((i) => MapEntry('files', i)));
+    }
     final _options = _setStreamType<Drafts>(
       Options(
             method: 'POST',

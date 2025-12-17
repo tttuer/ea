@@ -1,4 +1,5 @@
 import 'package:electronic_approval/drafts/model/approver_line.dart';
+import 'package:electronic_approval/drafts/provider/drafts_provider.dart';
 import 'package:electronic_approval/drafts/view/search_user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -271,7 +272,7 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                           approverId: '',
                           approverUserId: selectedGroup.approverIds[entry.key],
                           approverName: selectedGroup.approverNames[entry.key],
-                          stepOrder: entry.key,
+                          stepOrder: entry.key + 1,
                           isRequired: true,
                           isParallel: false,
                         ),
@@ -351,7 +352,7 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                           ],
                         ),
                         title: Text(line.approverName),
-                        subtitle: Text('${line.stepOrder + 1} 단계'),
+                        subtitle: Text('${line.stepOrder} 단계'),
                         trailing: IconButton(
                           onPressed: () {
                             ref
@@ -462,10 +463,6 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
                       color: Colors.indigoAccent,
                     ),
                     title: Text(_getFileName(file)),
-                    trailing: IconButton(
-                      icon: Icon(Icons.download),
-                      onPressed: () {},
-                    ),
                   ),
                 ),
               ),
@@ -528,7 +525,30 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
   }
 
   void _submit() async {
-    ref.read(createDraftsProvider.notifier).createDraft();
+    try {
+      await ref.read(createDraftsProvider.notifier).createDraft();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('결재 요청이 제출되었습니다.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      ref.invalidate(draftsListNotifierProvider);
+
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('결재 요청 제출에 실패했습니다.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _previousStep() {

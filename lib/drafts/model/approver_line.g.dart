@@ -7,20 +7,20 @@ part of 'approver_line.dart';
 // **************************************************************************
 
 ApproverLine _$ApproverLineFromJson(Map<String, dynamic> json) => ApproverLine(
-  approverId: json['approverId'] as String,
-  approverUserId: json['approverUserId'] as String,
-  approverName: json['approverName'] as String,
-  stepOrder: (json['stepOrder'] as num).toInt(),
-  isRequired: json['isRequired'] as bool,
-  isParallel: json['isParallel'] as bool,
+  approverId: json['approver_id'] as String,
+  approverUserId: json['approver_user_id'] as String,
+  approverName: json['approver_name'] as String,
+  stepOrder: (json['step_order'] as num).toInt(),
+  isRequired: json['is_required'] as bool,
+  isParallel: json['is_parallel'] as bool,
 );
 
 Map<String, dynamic> _$ApproverLineToJson(ApproverLine instance) =>
     <String, dynamic>{
-      'approverId': instance.approverId,
-      'approverUserId': instance.approverUserId,
-      'approverName': instance.approverName,
-      'stepOrder': instance.stepOrder,
-      'isRequired': instance.isRequired,
-      'isParallel': instance.isParallel,
+      'approver_id': instance.approverId,
+      'approver_user_id': instance.approverUserId,
+      'approver_name': instance.approverName,
+      'step_order': instance.stepOrder,
+      'is_required': instance.isRequired,
+      'is_parallel': instance.isParallel,
     };

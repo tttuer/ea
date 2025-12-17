@@ -15,7 +15,8 @@ final draftsRepositoryProvider = Provider<DraftsRepository>((ref) {
 
 @RestApi()
 abstract class DraftsRepository {
-  factory DraftsRepository(Dio dio, {required String baseUrl}) = _DraftsRepository;
+  factory DraftsRepository(Dio dio, {required String baseUrl}) =
+      _DraftsRepository;
 
   @GET('/approvals')
   @Headers({'access_token': true})
@@ -32,12 +33,12 @@ abstract class DraftsRepository {
   @Headers({'access_token': true})
   @MultiPart()
   Future<Drafts> createDraft({
-    @Field('title') required String title,
-    @Field('content') required String content,
-    @Field('template_id') String? templateId,
-    @Field('form_data') String? formData,
-    @Field('department_id') String? departmentId,
-    @Field('approval_lines') String? approvalLines,
+    @Part(name: 'title') required String title,
+    @Part(name: 'content') required String content,
+    @Part(name: 'template_id') String? templateId,
+    @Part(name: 'form_data') String? formData,
+    @Part(name: 'department_id') String? departmentId,
+    @Part(name: 'approval_lines') String? approvalLines,
     @Part(name: 'files') List<MultipartFile>? files,
   });
 

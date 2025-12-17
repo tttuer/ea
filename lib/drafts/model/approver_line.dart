@@ -4,11 +4,17 @@ part 'approver_line.g.dart';
 
 @JsonSerializable()
 class ApproverLine {
+  @JsonKey(name: 'approver_id')
   String approverId;
+  @JsonKey(name: 'approver_user_id')
   String approverUserId;
+  @JsonKey(name: 'approver_name')
   String approverName;
+  @JsonKey(name: 'step_order')
   int stepOrder;
+  @JsonKey(name: 'is_required')
   bool isRequired;
+  @JsonKey(name: 'is_parallel')
   bool isParallel;
 
   ApproverLine({

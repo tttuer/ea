@@ -145,7 +145,7 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
                                 approverId: '',
                                 approverUserId: user.userId,
                                 approverName: user.name,
-                                stepOrder: currentApprovers.length,
+                                stepOrder: currentApprovers.length + 1,
                                 isRequired: true,
                                 isParallel: false,
                               ),

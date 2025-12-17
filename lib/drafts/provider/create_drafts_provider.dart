@@ -48,7 +48,9 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
 
   void addApprover(ApproverLine approverLine) {
     final currentApproverLines = state.approverLines ?? [];
-    if (currentApproverLines.any((a) => a.approverUserId == approverLine.approverUserId)) {
+    if (currentApproverLines.any(
+      (a) => a.approverUserId == approverLine.approverUserId,
+    )) {
       return;
     }
     state = state.copyWith(
@@ -59,14 +61,14 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
   void addApprovers(List<ApproverLine> approverLines) {
     final currentApproverLines = state.approverLines ?? [];
     for (var approverLine in approverLines) {
-      if (currentApproverLines.any((a) => a.approverUserId == approverLine.approverUserId)) {
+      if (currentApproverLines.any(
+        (a) => a.approverUserId == approverLine.approverUserId,
+      )) {
         continue;
       }
       currentApproverLines.add(approverLine);
     }
-    state = state.copyWith(
-      approverLines: currentApproverLines,
-    );
+    state = state.copyWith(approverLines: currentApproverLines);
   }
 
   void removeApprover(ApproverLine approverLine) {
@@ -76,18 +78,21 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
           .where((a) => a.approverUserId != approverLine.approverUserId)
           .toList(),
     );
-    
-    final reorderedApprovderLines = state.approverLines?.asMap()
-    .entries
-    .map((entry) => ApproverLine(
-      approverId: entry.value.approverId,
-      approverUserId: entry.value.approverUserId,
-      approverName: entry.value.approverName,
-      stepOrder: entry.key,
-      isRequired: entry.value.isRequired,
-      isParallel: entry.value.isParallel,
-    ))
-    .toList();
+
+    final reorderedApprovderLines = state.approverLines
+        ?.asMap()
+        .entries
+        .map(
+          (entry) => ApproverLine(
+            approverId: entry.value.approverId,
+            approverUserId: entry.value.approverUserId,
+            approverName: entry.value.approverName,
+            stepOrder: entry.key + 1,
+            isRequired: entry.value.isRequired,
+            isParallel: entry.value.isParallel,
+          ),
+        )
+        .toList();
 
     state = state.copyWith(approverLines: reorderedApprovderLines);
   }
@@ -105,7 +110,7 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
         approverId: entry.value.approverId,
         approverUserId: entry.value.approverUserId,
         approverName: entry.value.approverName,
-        stepOrder: entry.key,
+        stepOrder: entry.key + 1,
         isRequired: entry.value.isRequired,
         isParallel: entry.value.isParallel,
       );
@@ -133,6 +138,29 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
         }
       }
 
+      // 🔍 디버깅: approval_lines 데이터 확인
+      final approvalLinesJson = state.approverLines != null
+          ? jsonEncode(
+              state.approverLines!.map((line) => line.toJson()).toList(),
+            )
+          : null;
+
+      print('📤 전송 데이터:');
+      print('title: ${state.title}');
+      print('content: ${state.content}');
+      print('approvalLines 개수: ${state.approverLines?.length}');
+      print('approvalLines JSON: $approvalLinesJson');
+
+      // approverLines의 각 항목 상세 출력
+      if (state.approverLines != null) {
+        for (var i = 0; i < state.approverLines!.length; i++) {
+          final line = state.approverLines![i];
+          print(
+            '  [$i] approverUserId: ${line.approverUserId}, stepOrder: ${line.stepOrder}, approverId: "${line.approverId}"',
+          );
+        }
+      }
+
       await _draftsRepository.createDraft(
         title: state.title,
         content: state.content,
@@ -146,6 +174,13 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
 
       reset();
     } catch (e) {
+      print('e: $e');
+
+      if (e is DioException) {
+        print('e: ${e.response?.statusCode}');
+        print('e: ${e.response?.data}');
+        print('e: ${e.response?.headers}');
+      }
       state = state.copyWith(error: e.toString());
     } finally {
       setIsSubmitting(false);
