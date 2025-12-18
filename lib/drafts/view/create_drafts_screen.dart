@@ -563,20 +563,6 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
     }
   }
 
-  Future<void> _checkCreateDraft() async {
-    final state = ref.read(createDraftsProvider);
-    if (state.title.isEmpty || state.content.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('제목과 내용을 입력해주세요.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-  }
-
   Future<void> _pickFiles() async {
     final result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result != null) {

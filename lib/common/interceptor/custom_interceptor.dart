@@ -21,10 +21,14 @@ class CustomInterceptor extends Interceptor {
     }
 
     if (options.extra['retried'] == true) {
+      options.extra['retried'] = false;
+
       return handler.reject(
         DioException(requestOptions: options, message: 'Retried'),
       );
     }
+
+    options.extra['retried'] = false;
 
     handler.next(options);
   }
@@ -36,8 +40,6 @@ class CustomInterceptor extends Interceptor {
 
     final isLoginPath = path == '/users/login';
     final isRefreshPath = path == '/users/refresh';
-    print('access_token: ${err.requestOptions.headers['access_token']}');
-    print('refresh_token: ${err.requestOptions.headers['refresh_token']}');
 
     if (is401Error && (isLoginPath || isRefreshPath)) {
       return handler.reject(err);

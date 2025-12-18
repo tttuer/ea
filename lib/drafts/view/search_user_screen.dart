@@ -18,8 +18,6 @@ class _SearchUserScreenState extends ConsumerState<SearchUserScreen> {
   List<UserResponse> _selectedUsers = [];
   @override
   Widget build(BuildContext context) {
-    final userSearchState = ref.watch(userSearchNotifierProvider);
-
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(

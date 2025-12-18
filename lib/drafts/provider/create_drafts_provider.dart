@@ -138,29 +138,6 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
         }
       }
 
-      // 🔍 디버깅: approval_lines 데이터 확인
-      final approvalLinesJson = state.approverLines != null
-          ? jsonEncode(
-              state.approverLines!.map((line) => line.toJson()).toList(),
-            )
-          : null;
-
-      print('📤 전송 데이터:');
-      print('title: ${state.title}');
-      print('content: ${state.content}');
-      print('approvalLines 개수: ${state.approverLines?.length}');
-      print('approvalLines JSON: $approvalLinesJson');
-
-      // approverLines의 각 항목 상세 출력
-      if (state.approverLines != null) {
-        for (var i = 0; i < state.approverLines!.length; i++) {
-          final line = state.approverLines![i];
-          print(
-            '  [$i] approverUserId: ${line.approverUserId}, stepOrder: ${line.stepOrder}, approverId: "${line.approverId}"',
-          );
-        }
-      }
-
       await _draftsRepository.createDraft(
         title: state.title,
         content: state.content,
@@ -174,13 +151,6 @@ class CreateDraftsNotifier extends Notifier<CreateDraftsState> {
 
       reset();
     } catch (e) {
-      print('e: $e');
-
-      if (e is DioException) {
-        print('e: ${e.response?.statusCode}');
-        print('e: ${e.response?.data}');
-        print('e: ${e.response?.headers}');
-      }
       state = state.copyWith(error: e.toString());
     } finally {
       setIsSubmitting(false);
