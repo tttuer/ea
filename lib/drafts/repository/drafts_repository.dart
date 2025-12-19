@@ -10,7 +10,7 @@ part 'drafts_repository.g.dart';
 
 final draftsRepositoryProvider = Provider<DraftsRepository>((ref) {
   final dio = ref.watch(dioProvider);
-  return DraftsRepository(dio, baseUrl: '${dio.options.baseUrl}');
+  return DraftsRepository(dio, baseUrl: dio.options.baseUrl);
 });
 
 @RestApi()

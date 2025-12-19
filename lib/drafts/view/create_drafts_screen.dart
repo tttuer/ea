@@ -474,19 +474,41 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
   }
 
   Widget _buildBottomButtons() {
+    final state = ref.watch(createDraftsProvider);
+    final isSubmitting = state.isSubmitting;
+
     return Padding(
       padding: EdgeInsets.all(16),
       child: Row(
         children: [
           if (_currentStep > 0)
             Expanded(
-              child: CustomButton(onPressed: _previousStep, child: Text('이전')),
+              child: CustomButton(
+                onPressed: isSubmitting ? null : _previousStep,
+                child: Text('이전'),
+              ),
             ),
           if (_currentStep > 0) SizedBox(width: 8),
           Expanded(
             child: CustomButton(
-              onPressed: _currentStep == 2 ? _submit : _nextStep,
-              child: Text(_currentStep == 2 ? '제출' : '다음'),
+              onPressed: isSubmitting
+                  ? null
+                  : (_currentStep == 2 ? _submit : _nextStep),
+              child: isSubmitting
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(_currentStep == 2 ? '제출' : '다음'),
             ),
           ),
         ],
@@ -525,30 +547,29 @@ class _CreateDraftsScreenState extends ConsumerState<CreateDraftsScreen> {
   }
 
   void _submit() async {
-    try {
-      await ref.read(createDraftsProvider.notifier).createDraft();
+    await ref.read(createDraftsProvider.notifier).createDraft();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('결재 요청이 제출되었습니다.'),
-          backgroundColor: Colors.green,
-        ),
-      );
+    final state = ref.read(createDraftsProvider);
 
-      ref.invalidate(draftsListNotifierProvider);
-
-      Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
+    if (state.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('결재 요청 제출에 실패했습니다.'),
           backgroundColor: Colors.red,
         ),
       );
+      return;
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('결재 요청이 제출되었습니다.'), backgroundColor: Colors.green),
+    );
+
+    ref.invalidate(draftsListNotifierProvider);
+
+    Navigator.pop(context);
   }
 
   void _previousStep() {
