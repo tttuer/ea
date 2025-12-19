@@ -16,16 +16,7 @@ class CustomInterceptor extends Interceptor {
 
     if (isAccessTokenExists) {
       final accessToken = await _token.getAccessToken();
-
       options.headers.addAll({'authorization': 'Bearer $accessToken'});
-    }
-
-    if (options.extra['retried'] == true) {
-      options.extra['retried'] = false;
-
-      return handler.reject(
-        DioException(requestOptions: options, message: 'Retried'),
-      );
     }
 
     options.extra['retried'] = false;
@@ -46,12 +37,14 @@ class CustomInterceptor extends Interceptor {
     }
 
     try {
-      final refreshToken = await _token.getRefreshToken();
-      if (refreshToken == null) {
+      var options = err.requestOptions;
+
+      if (options.extra['retried'] == true) {
         return handler.reject(err);
       }
-      var options = err.requestOptions;
-      if (options.extra['retried'] == true) {
+
+      final refreshToken = await _token.getRefreshToken();
+      if (refreshToken == null) {
         return handler.reject(err);
       }
 
@@ -69,6 +62,7 @@ class CustomInterceptor extends Interceptor {
       options.headers.addAll({'authorization': 'Bearer $accessToken'});
 
       options.extra['retried'] = true;
+
       var response = await _dio.fetch(options);
 
       return handler.resolve(response);
